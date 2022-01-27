@@ -1,0 +1,11 @@
+{
+  "name": "breezy-yahrzeits",
+  "version": "0.1.0",
+  "description": "Utilities for delivering Yahrzeit functionality for Breeze users",
+  "main": "getData.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "James Schaffer",
+  "license": "MIT"
+}
