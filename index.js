@@ -1,9 +1,27 @@
+import fetch from "node-fetch"
+import pkg from 'json-2-csv';
+const { json2csv } = pkg;
+import * as fs from 'fs';
+import {HDate, greg} from '@hebcal/core';
+
+const apiKey = '0c9b2cb96e3593dbe9dcb74b029f8b03'
+const formID = '323268'
 const baseURL = 'https://koltzedek.breezechms.com/api/'
-apiKey = '0c9b2cb96e3593dbe9dcb74b029f8b03'
-formID = '323268'
 const entriesPath = `forms/list_form_entries?form_id=${formID}&details=1`
 
-const fetchYahrzeitFormEntries = () => {
+// January == 0
+const queryMonth = 2
+const queryYear = 2022
+const hdQueryMonthStart = new HDate(new Date(queryYear, queryMonth, 1));
+const hdQueryMonthEnd = new HDate(new Date(queryYear, queryMonth, greg.daysInMonth(queryMonth+1, queryYear)));
+
+// CONSTANTS
+const OBSERVATION_SELECTION = '2092220853'
+const GREGORIAN_CAL = '403'
+const HEBREW_CAL = '404'
+const GREGORIAN_DATE_OF_PASSING = '2092220844'
+
+const fetchYahrzeitFormEntries = async () => {
     const configObj = {
         headers: {
             'Content-Type': 'application/json',
@@ -11,12 +29,96 @@ const fetchYahrzeitFormEntries = () => {
           },
       
     }
-    fetch(baseURL + entriesPath, configObj)
-    .then(resp => resp.json())
-    .then(json => console.log(json))
+    const resp = await fetch(baseURL + entriesPath, configObj)
+    return resp.json()
 }
 
-fetchYahrzeitFormEntries()
+const makeDate = (dateStr) => {
+    const dateArr = dateStr.split('/')
+    const month = parseInt(dateArr[0]) - 1
+    const day = parseInt(dateArr[1])
+    const year = parseInt(dateArr[2])
+    return new Date(year, month, day)
+}
+
+const getYahrDate = (hdDateOfPassing) => {
+    // if query month start and end are in same hebrew calendar year, 
+    // then make a new hebrew date in that year with the date and month of passing
+    if (hdQueryMonthStart.getFullYear() === hdQueryMonthEnd.getFullYear()) {
+        return new HDate(hdDateOfPassing.getDate(), hdDateOfPassing.getMonth(), hdQueryMonthStart.getFullYear())
+    } else {
+        // otherwise, the query month spans elul / tishrei 
+        const observationYear = hdDateOfPassing.getMonth() < 7 ? hdQueryMonthStart.getFullYear() : hdQueryMonthEnd.getFullYear()
+        return new HDate(hdDateOfPassing.getDate(), hdDateOfPassing.getMonth(), observationYear)
+
+    }
+}
+
+const filterResponses = (json) => {
+    return json.filter(form => {
+        const selection = form.response[OBSERVATION_SELECTION].value
+        const dateOfPassing = makeDate(form.response[GREGORIAN_DATE_OF_PASSING])
+        
+        // for forms that observe english dates
+        // check if date falls with the specified month
+        if (selection === GREGORIAN_CAL) {
+            const yahr = new Date(queryYear, dateOfPassing.getMonth(), dateOfPassing.getDate())
+            form.response.yahr = yahr
+            form.response.yahrUnix = yahr.getTime()
+            form.response.include = dateOfPassing.getMonth() === queryMonth
+            return true
+        } else if (selection === HEBREW_CAL) {
+            const hdDateOfPassing = new HDate(dateOfPassing);
+            const hdYahrDate = getYahrDate(hdDateOfPassing)
+
+            form.response.yahr = hdYahrDate.greg()
+            form.response.yahrUnix = hdYahrDate.greg().getTime()
+            form.response.include = hdQueryMonthStart.abs() <= hdYahrDate.abs() && hdYahrDate.abs() <= hdQueryMonthEnd.abs()
+            return true
+            // console.log('pass', hdDateOfPassing)
+            // console.log('yahr', hdYahrDate)
+            // console.log(result)
+            // console.log('-----------------')
+
+        }
+    })
+
+}
+
+const saveToCSV = (json) => {
+    json2csv(json, (err, csv) => {
+        fs.writeFile('forms.csv', csv, (err) => {
+            if (err) throw err;
+            console.log('The file has been saved!');
+          })
+    })
+
+}
+
+const run = async () => {
+    const json = await fetchYahrzeitFormEntries()
+    
+    saveToCSV(filterResponses(json))    
+
+}
+
+
+run()
+/*
+GOAL: I write in a month and year
+I get all the yahrzeits to be observed in that period
+They are organized by gregorian date of observation
+Each on identified whether it is observing the gregorian or hebrew date
+if hebrew date, it indicates what that date is
+
+
+*/
+
+
+
+
+
+
 
 const formFieldKey = [
     {
@@ -746,4 +848,87 @@ const responseObj = {
         "2092220848": "",
         "2092220851": " ($0)"
     }
+}
+
+const initialLogic = (hdDateOfPassing) => {
+    // if hebrew dates of query month start and end fall in the same hebrew month and this is the month of passing
+    if (hdQueryMonthStart.getMonth() === hdQueryMonthEnd.getMonth() && 
+        hdQueryMonthStart.getMonth() === hdDateOfPassing.getMonth()) {
+        
+        // then the hebrew date of the query month start must be less than or equal to the date of passing
+        // AND the hebrew date of passing must be less that or equal to the the query month end
+        if (hdQueryMonthStart.getDate() <= hdDateOfPassing.getDate() && 
+            hdDateOfPassing.getDate() <= hdQueryMonthEnd.getDate()) {
+            return true
+        }
+
+    // else, if hebrew dates of query month start and end fall in sequential hebrew months
+    } else if (hdQueryMonthStart.getMonth() + 1 === hdQueryMonthEnd.getMonth() ||
+               hdQueryMonthStart.getTisheiMonth() + 1 === hdQueryMonthEnd.getTisheiMonth()) {
+        // then, if the hebrew month of the query month start is the same as the month of passing
+        if (hdQueryMonthStart.getMonth() === hdDateOfPassing.getMonth()) {
+            // then the hebrew date of the query month start must be less than or equal to the date of passing
+            if (hdQueryMonthStart.getDate() <= hdDateOfPassing.getDate()) {
+                return true
+            }
+        
+        // but, if the hebrew month of passing is the same as the month of the the query month end
+        } else if (hdDateOfPassing.getMonth() === hdQueryMonthEnd.getMonth()) {
+            // then the hebrew date of passing must be less than or equal to the date of the query month end
+            if (hdDateOfPassing.getDate() <= hdQueryMonthEnd.getDate()) {
+                return true
+            }
+        
+        // and lastly, if the hebrew query month start and end are in non sequential months
+        } else {
+            // then any date in the month 
+            return true
+        }
+
+    }
+    return false
+}
+
+const fallsInHebrewDateRange = (hdDateOfPassing) => {
+
+    // if query month start and end are in same hebrew calendar year, 
+    // then make a new hebrew date in that year with the date and month of passing
+    // and see if it is between them via absolute dates
+    if (hdQueryMonthStart.getFullYear() === hdQueryMonthEnd.getFullYear()) {
+        const hdYahrDate = new HDate(hdDateOfPassing.getDate(), hdDateOfPassing.getMonth(), hdQueryMonthStart.getFullYear())
+        return hdQueryMonthStart.abs() <= hdYahrDate.abs() && hdYahrDate.abs() <= hdQueryMonthEnd.abs()
+
+    // otherwise, the dates are around elul / tishrei 
+    // you can be sure that the query month end will have a higher month number than query month start
+    } else {
+        // if the query start month is greater than month of passing, test fails
+        if (hdQueryMonthStart.getMonth() > hdDateOfPassing.getMonth()){
+            return false
+
+        // if the query start month is the month of passing...
+        } else if (hdQueryMonthStart.getMonth() === hdDateOfPassing.getMonth()) {
+            // then, test dates work out
+            return hdQueryMonthStart.getDate() <= hdDateOfPassing.getDate()
+        
+        // if the query start month is less than month of passing...
+        } else {
+            // if the query end month is greater than the month of passing, any date works
+            if (hdQueryMonthEnd.getMonth() > hdDateOfPassing.getMonth()) {
+                return true
+         
+            // if the query end month is the same as the month of passing...
+            } else if (hdQueryMonthEnd.getMonth() === hdDateOfPassing.getMonth()) {
+                // then, test dates work out
+                return hdQueryMonthEnd.getDate() >= hdDateOfPassing.getDate()
+            
+            // if the query end month is less than the month of passing...
+            } else {
+                return false
+            }
+
+        }
+
+
+    }
+    
 }

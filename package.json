@@ -2,10 +2,16 @@
   "name": "breezy-yahrzeits",
   "version": "0.1.0",
   "description": "Utilities for delivering Yahrzeit functionality for Breeze users",
-  "main": "getData.js",
+  "main": "index.js",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "James Schaffer",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "@hebcal/core": "^3.33.2",
+    "json-2-csv": "^3.16.1",
+    "node-fetch": "^3.2.0"
+  }
 }
