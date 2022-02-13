@@ -1,5 +1,7 @@
 node_modules/
-forms.csv
+forms*.csv
 credentials.json
 source_forms*
+.env
+email_template.js
 .DS_Store

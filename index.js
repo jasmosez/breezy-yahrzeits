@@ -1,22 +1,27 @@
+import 'dotenv/config'
 import fetch from "node-fetch"
-import pkg from 'json-2-csv';
-const { json2csv, csv2jsonAsync } = pkg;
 import * as fs from 'fs';
 import {HDate, greg} from '@hebcal/core';
-import { diffString, diff } from 'json-diff';
+import pkg from 'json-2-csv';
+const { json2csv, csv2jsonAsync } = pkg;
 
-const apiKey = '0c9b2cb96e3593dbe9dcb74b029f8b03'
-const formID = '323268'
+// API VALUES
+const apiKey = process.env.BREEZE_API
+const formID = process.env.FORM_ID
 const baseURL = 'https://koltzedek.breezechms.com/api/'
 const entriesPath = `forms/list_form_entries?form_id=${formID}&details=1`
 
+// TEMPORARY CONSTANTS: TO BE USER INPUTTED
 // January == 0
 const queryMonth = 2 //March
 const queryYear = 2022
 const hdQueryMonthStart = new HDate(new Date(queryYear, queryMonth, 1));
 const hdQueryMonthEnd = new HDate(new Date(queryYear, queryMonth, greg.daysInMonth(queryMonth+1, queryYear)));
 
-// CONSTANTS
+// FILE SAVING
+const savedCSV = 'forms2.csv'
+
+// FORM CONSTANTS
 const OBSERVATION_SELECTION = '2092220853'
 const GREGORIAN_CAL = '403'
 const HEBREW_CAL = '404'
@@ -39,6 +44,11 @@ const loadYahrzeitFormEntries = async () => {
     return csv2jsonAsync(data)
 }
 
+/**
+ * Creates a Date object from 'mm/dd/yyyy' string
+ * @param {string} dateStr 
+ * @returns {Date} 
+ */
 const makeDate = (dateStr) => {
     const dateArr = dateStr.split('/')
     const month = parseInt(dateArr[0]) - 1
@@ -89,9 +99,13 @@ const filterResponses = (json) => {
 
 }
 
+/**
+ * Save JSON data to a csv
+ * @param {json} json 
+ */
 const saveToCSV = (json) => {
     json2csv(json, (err, csv) => {
-        fs.writeFile('forms.csv', csv, (err) => {
+        fs.writeFile(savedCSV, csv, (err) => {
             if (err) throw err;
             console.log('The file has been saved!');
           })
@@ -101,8 +115,8 @@ const saveToCSV = (json) => {
 
 const run = async () => {
 
-    // const json = await fetchYahrzeitFormEntries()
-    const json = await loadYahrzeitFormEntries()
+    const json = await fetchYahrzeitFormEntries()
+    // const json = await loadYahrzeitFormEntries()
     saveToCSV(filterResponses(json))
 
 }

@@ -3,14 +3,16 @@
   "version": "0.1.0",
   "description": "Utilities for delivering Yahrzeit functionality for Breeze users",
   "main": "index.js",
-  "type": "commonJS",
+  "type": "module",
   "scripts": {
+    "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "James Schaffer",
   "license": "MIT",
   "dependencies": {
     "@hebcal/core": "^3.33.2",
+    "dotenv": "^16.0.0",
     "googleapis": "^94.0.0",
     "json-2-csv": "^3.16.1",
     "json-diff": "^0.7.1",
