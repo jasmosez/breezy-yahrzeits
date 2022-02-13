@@ -1,3 +1,5 @@
 node_modules/
 forms.csv
+credentials.json
+source_forms*
 .DS_Store
