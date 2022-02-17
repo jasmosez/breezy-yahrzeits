@@ -1,6 +1,6 @@
 import 'dotenv/config'
 import nodemailer from 'nodemailer'
-import {from, to, subject, textBody, htmlBody} from './email_template.js'
+import {from, to, cc, subject, textBody, htmlBody} from './email_template.js'
 
 async function main() {
 
@@ -17,6 +17,7 @@ async function main() {
   let info = await transporter.sendMail({
     from,
     to,
+    cc,
     subject,
     textBody,
     htmlBody
