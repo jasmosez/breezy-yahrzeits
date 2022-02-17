@@ -50,29 +50,52 @@ const loadYahrzeitFormEntries = async () => {
  * @returns {Date} 
  */
 const makeDate = (dateStr) => {
-    const dateArr = dateStr.split('/')
-    const month = parseInt(dateArr[0]) - 1
-    const day = parseInt(dateArr[1])
-    const year = parseInt(dateArr[2])
+    let dateArr
+    let month
+    let day
+    let year
+
+    if (dateStr.search('/') > 0) {
+        dateArr = dateStr.split('/')
+        month = parseInt(dateArr[0]) - 1
+        day = parseInt(dateArr[1])
+        year = parseInt(dateArr[2])
+    } else {
+        dateArr = dateStr.split('-')
+        month = parseInt(dateArr[1]) - 1
+        day = parseInt(dateArr[2])
+        year = parseInt(dateArr[0])
+    }
+
     return new Date(year, month, day)
 }
 
+
+/**
+ * find the next yahrzeit observation date
+ * @param {HDate} hdDateOfPassing 
+ * @returns {Date}
+ */
 const getYahr = (hdDateOfPassing) => {
-    let hdYahrDate
-    // if query month start and end are in same hebrew calendar year, 
-    // then make a new hebrew date in that year with the date and month of passing
-    if (hdQueryMonthStart.getFullYear() === hdQueryMonthEnd.getFullYear()) {
-        // REMOVE
-        // guaranteed to be 5782
-        hdYahrDate = new HDate(hdDateOfPassing.getDate(), hdDateOfPassing.getMonth(), hdQueryMonthStart.getFullYear())
+    let nextYahr
+    const today = new HDate()
+    const thisYearYahr = new HDate(
+        hdDateOfPassing.getDate(),
+        hdDateOfPassing.getMonth(),
+        today.getFullYear()
+    )
+
+    if (thisYearYahr.abs() >= today.abs()) {
+        nextYahr = thisYearYahr
     } else {
-        // otherwise, the query month spans elul / tishrei 
-        // if the date of passing is prior to rosh hashana, use the year of the query month start
-        // if the date of passing is in tishri or later, use the year of the query month end
-        const observationYear = hdDateOfPassing.getMonth() < 7 ? hdQueryMonthStart.getFullYear() : hdQueryMonthEnd.getFullYear()
-        hdYahrDate = new HDate(hdDateOfPassing.getDate(), hdDateOfPassing.getMonth(), observationYear)
+        nextYahr = new HDate(
+            hdDateOfPassing.getDate(),
+            hdDateOfPassing.getMonth(),
+            today.getFullYear() + 1
+        )
     }
-    return hdYahrDate.greg()
+
+    return nextYahr.greg()
 }
 
 const filterResponses = (json) => {
@@ -84,7 +107,11 @@ const filterResponses = (json) => {
         if (selection === GREGORIAN_CAL) {
             // REMOVE
             // guaranteed to be 2022
-            yahr = new Date(queryYear, dateOfPassing.getMonth(), dateOfPassing.getDate())
+            const now = new Date()
+            const thisGregYear = now.getFullYear()
+            const thisGregYearsYahr = new Date(thisGregYear, dateOfPassing.getMonth(), dateOfPassing.getDate())
+            yahr = (thisGregYearsYahr > now) ? thisGregYearsYahr : new Date(thisGregYear + 1, dateOfPassing.getMonth(), dateOfPassing.getDate())
+
         } else if (selection === HEBREW_CAL) {
             const hdDateOfPassing = new HDate(dateOfPassing);
             form.response.hdDateOfPassing = hdDateOfPassing.render()
@@ -114,15 +141,18 @@ const saveToCSV = (json) => {
 }
 
 const run = async () => {
-
-    const json = await fetchYahrzeitFormEntries()
+    console.log(await getYahr(new Date(2021, 2, 2)))
+    // const json = await fetchYahrzeitFormEntries()
     // const json = await loadYahrzeitFormEntries()
-    saveToCSV(filterResponses(json))
+    // saveToCSV(filterResponses(json))
 
 }
 
 
 run()
+
+
+export {makeDate, getYahr, filterResponses}
 /*
 GOAL: I write in a month and year
 I get all the yahrzeits to be observed in that period
