@@ -2,6 +2,8 @@ import {makeDate, getYahr, filterResponses} from '../index.js'
 import {HDate, greg} from '@hebcal/core';
 import assert from 'assert'
 import sinon from 'sinon'
+import {OBSERVATION_SELECTION, GREGORIAN_CAL, HEBREW_CAL, GREGORIAN_DATE_OF_PASSING} from '../lib/form_constants.js'
+
 
 
 
@@ -61,5 +63,45 @@ describe('getYahr during a leap year', () => {
     it('Adar II dates return as Adar II', async () => {
         // 12th of Adar II
         assert.deepEqual(getYahr(new HDate(12, 13, 5779)), new Date(2022, 2, 15))
+    })
+})
+
+describe('filterResponses', () => {
+    const calendars = [
+        {
+            'selection': GREGORIAN_CAL, 
+            'label': "Gregorian", 
+            'yahr': "2022-03-02",
+            'verb': 'does not populate',
+            'hdDateOfPassing': undefined
+        }, 
+        {
+            'selection': HEBREW_CAL, 
+            'label': "Hebrew", 
+            'yahr': "2022-02-19",
+            'verb': 'populates',
+            'hdDateOfPassing': "18th of Adar, 5781"
+        }
+    ]
+        
+    calendars.forEach(cal => {
+        const jsonStr = `[{
+            "response": {
+                "${OBSERVATION_SELECTION}": {
+                    "value": ${cal.selection}
+                },
+                "${GREGORIAN_DATE_OF_PASSING}": "03/02/2021"
+            }
+        }]`
+        const json = JSON.parse(jsonStr)
+        const newJson = filterResponses(json)
+
+        console.log(json)
+        it(`populates response.yahr value for ${cal.label} calendar`, ()=>{
+            assert.equal(newJson[0].response.yahr, cal.yahr)
+        })
+        it(`${cal.verb} response.hdDateOfPassing value for ${cal.label} calendar`, ()=>{
+            assert.equal(newJson[0].response.hdDateOfPassing, cal.hdDateOfPassing)
+        })
     })
 })
