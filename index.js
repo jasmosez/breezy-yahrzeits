@@ -3,6 +3,7 @@ import fetch from "node-fetch"
 import * as fs from 'fs';
 import {HDate, greg} from '@hebcal/core';
 import pkg from 'json-2-csv';
+import {OBSERVATION_SELECTION, GREGORIAN_CAL, HEBREW_CAL, GREGORIAN_DATE_OF_PASSING} from './lib/form_constants.js'
 const { json2csv, csv2jsonAsync } = pkg;
 
 // API VALUES
@@ -11,21 +12,8 @@ const formID = process.env.FORM_ID
 const baseURL = 'https://koltzedek.breezechms.com/api/'
 const entriesPath = `forms/list_form_entries?form_id=${formID}&details=1`
 
-// TEMPORARY CONSTANTS: TO BE USER INPUTTED
-// January == 0
-const queryMonth = 2 //March
-const queryYear = 2022
-const hdQueryMonthStart = new HDate(new Date(queryYear, queryMonth, 1));
-const hdQueryMonthEnd = new HDate(new Date(queryYear, queryMonth, greg.daysInMonth(queryMonth+1, queryYear)));
-
 // FILE SAVING
 const savedCSV = 'forms2.csv'
-
-// FORM CONSTANTS
-const OBSERVATION_SELECTION = '2092220853'
-const GREGORIAN_CAL = '403'
-const HEBREW_CAL = '404'
-const GREGORIAN_DATE_OF_PASSING = '2092220844'
 
 const fetchYahrzeitFormEntries = async () => {
     const configObj = {
@@ -45,7 +33,7 @@ const loadYahrzeitFormEntries = async () => {
 }
 
 /**
- * Creates a Date object from 'mm/dd/yyyy' string
+ * Creates a Date object from 'mm/dd/yyyy' or 'yyyy-mm-dd'
  * @param {string} dateStr 
  * @returns {Date} 
  */
@@ -72,7 +60,7 @@ const makeDate = (dateStr) => {
 
 
 /**
- * find the next yahrzeit observation date
+ * find the next gregorian observation date of a hebrew date of passing
  * @param {HDate} hdDateOfPassing 
  * @returns {Date}
  */
@@ -105,8 +93,6 @@ const filterResponses = (json) => {
         let yahr
         
         if (selection === GREGORIAN_CAL) {
-            // REMOVE
-            // guaranteed to be 2022
             const now = new Date()
             const thisGregYear = now.getFullYear()
             const thisGregYearsYahr = new Date(thisGregYear, dateOfPassing.getMonth(), dateOfPassing.getDate())
@@ -120,8 +106,6 @@ const filterResponses = (json) => {
 
         form.response.yahr = yahr.toISOString().slice(0, 10)
         return true
-        // if (yahr.getMonth() === queryMonth) {
-        // }
     })
 
 }
