@@ -6,6 +6,10 @@ import {getInput,
 
 const run = async () => {
     const monthFilter = getInput()
+    if (!monthFilter) {
+        console.log('Entry is not a number in range. Exiting.')
+        process.exit()
+    }
     const json = await fetchYahrzeitFormEntries()
     // const json = await loadYahrzeitFormEntries()
     saveToCSV(filterResponses(json))

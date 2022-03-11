@@ -1,14 +1,25 @@
-import {getInput, makeDate, getYahr, filterResponses} from '../lib/dataCollection.js'
+import {assessMonthFilterValidity, makeDate, getYahr, filterResponses} from '../lib/dataCollection.js'
 import {HDate, greg} from '@hebcal/core';
 import assert from 'assert'
 import sinon from 'sinon'
+import promptInit from "prompt-sync"
 import {OBSERVATION_SELECTION, GREGORIAN_CAL, HEBREW_CAL, GREGORIAN_DATE_OF_PASSING, SUNSET_SELECTION, BEFORE_SUNSET, AFTER_SUNSET, UNSURE_SUNSET} from '../lib/form_constants.js'
 
-describe('getInput', () => {
+describe('assessMonthFilterValidity', () => {
 
-    it('Only accepts numbers between 1 and 12', ()=>{
-        const prompt = sinon.fake.returns(1)
-        assert.equal(getInput(), 1)
+    it('Accepts strings representing numbers between 1 and 12', ()=>{
+        assert.equal(assessMonthFilterValidity('1'), 1)
+        assert.equal(assessMonthFilterValidity('12'), 12)
+    })
+    it('Does not accept strings representing numbers less than 1 or more than 12', ()=>{
+        assert.equal(assessMonthFilterValidity('0'), false)
+        assert.equal(assessMonthFilterValidity('13'), false)
+    })
+    it('Does not accept strings that cannot be parsed to an integer', ()=>{
+        assert.equal(assessMonthFilterValidity('hello'), false)
+    })
+    it('Parses decimals to their rounded-downinteger', ()=>{
+        assert.equal(assessMonthFilterValidity('1.1'), 1)
     })
 })
 
