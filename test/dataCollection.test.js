@@ -1,4 +1,4 @@
-import {assessMonthFilterValidity, makeDate, getYahr, filterResponses} from '../lib/dataCollection.js'
+import {assessMonthFilterValidity, makeDate, getYahr, mapResponses} from '../lib/dataCollection.js'
 import {HDate, greg} from '@hebcal/core';
 import assert from 'assert'
 import sinon from 'sinon'
@@ -82,7 +82,7 @@ describe('getYahr during a leap year', () => {
     })
 })
 
-describe('filterResponses', () => {
+describe('mapResponses', () => {
     before(() => {
         const now = new Date(2022, 0, 1)
         sinon.useFakeTimers(now.getTime());
@@ -94,34 +94,56 @@ describe('filterResponses', () => {
         {
             'selection': GREGORIAN_CAL, 
             'sunset': BEFORE_SUNSET,
-            'label': "Gregorian calendar", 
-            'yahr': "2022-03-02",
-            'verb': 'does not populate',
-            'hdDateOfPassing': undefined
+            'label': "Gregorian calendar (BEFORE Sunset)", 
+            'g_date_of_passing': "March 2, 2021",
+            'hd_date_of_passing': "18th of Adar, 5781",
+            'yahr_in_selected_cal': "March 2, 2022",
+            'g_yahr_date': "2022-03-02",
+        }, 
+        {
+            'selection': GREGORIAN_CAL, 
+            'sunset': AFTER_SUNSET,
+            'label': "Gregorian calendar (AFTER Sunset)", 
+            'g_date_of_passing': "March 2, 2021",
+            'hd_date_of_passing': "19th of Adar, 5781",
+            'yahr_in_selected_cal': "March 2, 2022",
+            'g_yahr_date': "2022-03-02",
+        }, 
+        {
+            'selection': GREGORIAN_CAL, 
+            'sunset': UNSURE_SUNSET,
+            'label': "Gregorian calendar (UNSURE about Sunset treated as BEFORE Sunset)", 
+            'g_date_of_passing': "March 2, 2021",
+            'hd_date_of_passing': "18th of Adar, 5781",
+            'yahr_in_selected_cal': "March 2, 2022",
+            'g_yahr_date': "2022-03-02",
         }, 
         {
             'selection': HEBREW_CAL, 
             'sunset': BEFORE_SUNSET,
             'label': "Hebrew calendar (BEFORE Sunset)", 
-            'yahr': "2022-02-19",
-            'verb': 'populates',
-            'hdDateOfPassing': "18th of Adar, 5781"
+            'g_date_of_passing': "March 2, 2021",
+            'hd_date_of_passing': "18th of Adar, 5781",
+            'yahr_in_selected_cal': "18th of Adar, 5781",
+            'g_yahr_date': "2022-02-19",
         },
         {
             'selection': HEBREW_CAL, 
             'sunset': AFTER_SUNSET,
             'label': "Hebrew calendar (AFTER Sunset)", 
-            'yahr': "2022-02-20",
-            'verb': 'populates',
-            'hdDateOfPassing': "19th of Adar, 5781"
+            'g_date_of_passing': "March 2, 2021",
+            'hd_date_of_passing': "19th of Adar, 5781",
+            'yahr_in_selected_cal': "19th of Adar, 5781",
+            'g_yahr_date': "2022-02-20",
         },
         {
             'selection': HEBREW_CAL, 
             'sunset': UNSURE_SUNSET,
             'label': "Hebrew calendar (UNSURE about Sunset treated as BEFORE Sunset)", 
-            'yahr': "2022-02-19",
-            'verb': 'populates',
-            'hdDateOfPassing': "18th of Adar, 5781"
+            'g_date_of_passing': "March 2, 2021",
+            'hd_date_of_passing': "18th of Adar, 5781",
+            'yahr_in_selected_cal': "18th of Adar, 5781",
+            'g_yahr_date': "2022-02-19",
         }
     ]
         
@@ -139,13 +161,12 @@ describe('filterResponses', () => {
         }]`
         const json = JSON.parse(jsonStr)
 
-        it(`populates response.yahr value for ${cal.label} calendar`, ()=>{
-            const newJson = filterResponses(json)
-            assert.equal(newJson[0].response.yahr, cal.yahr)
-        })
-        it(`${cal.verb} response.hdDateOfPassing value for ${cal.label}`, ()=>{
-            const newJson = filterResponses(json)
-            assert.equal(newJson[0].response.hdDateOfPassing, cal.hdDateOfPassing)
+        it(`populates values for ${cal.label}`, ()=>{
+            const newJson = mapResponses(json)
+            assert.equal(newJson[0].response.date_of_passing, cal.date_of_passing)
+            assert.equal(newJson[0].response.hd_date_of_passing, cal.hd_date_of_passing)
+            assert.equal(newJson[0].response.yahrzeit_date_in_selected_cal, cal.yahrzeit_date_in_selected_cal)
+            assert.equal(newJson[0].response.gregorian_yahrzeit_date, cal.gregorian_yahrzeit_date)
         })
     })
 })
