@@ -3,17 +3,18 @@ import fetch from "node-fetch"
 import * as fs from 'fs';
 import {HDate, greg} from '@hebcal/core';
 import pkg from 'json-2-csv';
-import {OBSERVATION_SELECTION, GREGORIAN_CAL, HEBREW_CAL, GREGORIAN_DATE_OF_PASSING} from './lib/form_constants.js'
+import {FORM_ID, OBSERVATION_SELECTION, GREGORIAN_CAL, HEBREW_CAL, GREGORIAN_DATE_OF_PASSING, SUNSET_SELECTION, BEFORE_SUNSET, AFTER_SUNSET, UNSURE_SUNSET} from './lib/form_constants.js'
 const { json2csv, csv2jsonAsync } = pkg;
 
+const DAY_IN_MS = 24*60*60*1000
 // API VALUES
 const apiKey = process.env.BREEZE_API
-const formID = process.env.FORM_ID
-const baseURL = 'https://koltzedek.breezechms.com/api/'
-const entriesPath = `forms/list_form_entries?form_id=${formID}&details=1`
+const subdomain = process.env.BREEZE_SUBDOMAIN
+const baseURL = `https://${subdomain}.breezechms.com/api/`
+const entriesPath = `forms/list_form_entries?form_id=${FORM_ID}&details=1`
 
 // FILE SAVING
-const savedCSV = 'forms2.csv'
+const savedCSV = 'forms.csv'
 
 const fetchYahrzeitFormEntries = async () => {
     const configObj = {
@@ -99,7 +100,14 @@ const filterResponses = (json) => {
             yahr = (thisGregYearsYahr > now) ? thisGregYearsYahr : new Date(thisGregYear + 1, dateOfPassing.getMonth(), dateOfPassing.getDate())
 
         } else if (selection === HEBREW_CAL) {
-            const hdDateOfPassing = new HDate(dateOfPassing);
+            let hdDateOfPassing
+            const sunset = form.response[SUNSET_SELECTION].value.toString()
+            if (sunset === AFTER_SUNSET) {
+                const dateOfPassingPlusOne = new Date(dateOfPassing.getTime() + DAY_IN_MS)
+                hdDateOfPassing = new HDate(dateOfPassingPlusOne)
+            } else {
+                hdDateOfPassing = new HDate(dateOfPassing);
+            }
             form.response.hdDateOfPassing = hdDateOfPassing.render()
             yahr = getYahr(hdDateOfPassing)
         }
@@ -125,10 +133,9 @@ const saveToCSV = (json) => {
 }
 
 const run = async () => {
-    console.log(await getYahr(new Date(2021, 2, 2)))
-    // const json = await fetchYahrzeitFormEntries()
+    const json = await fetchYahrzeitFormEntries()
     // const json = await loadYahrzeitFormEntries()
-    // saveToCSV(filterResponses(json))
+    saveToCSV(filterResponses(json))
 
 }
 
