@@ -1,11 +1,16 @@
-import {makeDate, getYahr, filterResponses} from '../index.js'
+import {getInput, makeDate, getYahr, filterResponses} from '../lib/dataCollection.js'
 import {HDate, greg} from '@hebcal/core';
 import assert from 'assert'
 import sinon from 'sinon'
 import {OBSERVATION_SELECTION, GREGORIAN_CAL, HEBREW_CAL, GREGORIAN_DATE_OF_PASSING, SUNSET_SELECTION, BEFORE_SUNSET, AFTER_SUNSET, UNSURE_SUNSET} from '../lib/form_constants.js'
 
+describe('getInput', () => {
 
-
+    it('Only accepts numbers between 1 and 12', ()=>{
+        const prompt = sinon.fake.returns(1)
+        assert.equal(getInput(), 1)
+    })
+})
 
 describe('makeDate', () => {
     it('returns Date from "mm/dd/yyyy"', ()=>{
