@@ -98,7 +98,8 @@ describe('mapResponses', () => {
             'g_date_of_passing': "March 2, 2021",
             'hd_date_of_passing': "18th of Adar, 5781",
             'yahr_in_selected_cal': "March 2, 2022",
-            'g_yahr_date': "2022-03-02",
+            'g_yahr_date': "March 2, 2022",
+            'month_number': '3'
         }, 
         {
             'selection': GREGORIAN_CAL, 
@@ -107,7 +108,8 @@ describe('mapResponses', () => {
             'g_date_of_passing': "March 2, 2021",
             'hd_date_of_passing': "19th of Adar, 5781",
             'yahr_in_selected_cal': "March 2, 2022",
-            'g_yahr_date': "2022-03-02",
+            'g_yahr_date': "March 2, 2022",
+            'month_number': '3'
         }, 
         {
             'selection': GREGORIAN_CAL, 
@@ -116,7 +118,8 @@ describe('mapResponses', () => {
             'g_date_of_passing': "March 2, 2021",
             'hd_date_of_passing': "18th of Adar, 5781",
             'yahr_in_selected_cal': "March 2, 2022",
-            'g_yahr_date': "2022-03-02",
+            'g_yahr_date': "March 2, 2022",
+            'month_number': '3'
         }, 
         {
             'selection': HEBREW_CAL, 
@@ -125,7 +128,8 @@ describe('mapResponses', () => {
             'g_date_of_passing': "March 2, 2021",
             'hd_date_of_passing': "18th of Adar, 5781",
             'yahr_in_selected_cal': "18th of Adar, 5781",
-            'g_yahr_date': "2022-02-19",
+            'g_yahr_date': "February 19, 2022",
+            'month_number': '2'
         },
         {
             'selection': HEBREW_CAL, 
@@ -134,7 +138,8 @@ describe('mapResponses', () => {
             'g_date_of_passing': "March 2, 2021",
             'hd_date_of_passing': "19th of Adar, 5781",
             'yahr_in_selected_cal': "19th of Adar, 5781",
-            'g_yahr_date': "2022-02-20",
+            'g_yahr_date': "February 20, 2022",
+            'month_number': '2'
         },
         {
             'selection': HEBREW_CAL, 
@@ -143,7 +148,8 @@ describe('mapResponses', () => {
             'g_date_of_passing': "March 2, 2021",
             'hd_date_of_passing': "18th of Adar, 5781",
             'yahr_in_selected_cal': "18th of Adar, 5781",
-            'g_yahr_date': "2022-02-19",
+            'g_yahr_date': "February 19, 2022",
+            'month_number': '2'
         }
     ]
         
@@ -166,7 +172,8 @@ describe('mapResponses', () => {
             assert.equal(newJson[0].response.date_of_passing, cal.date_of_passing)
             assert.equal(newJson[0].response.hd_date_of_passing, cal.hd_date_of_passing)
             assert.equal(newJson[0].response.yahrzeit_date_in_selected_cal, cal.yahrzeit_date_in_selected_cal)
-            assert.equal(newJson[0].response.gregorian_yahrzeit_date, cal.gregorian_yahrzeit_date)
+            assert.equal(newJson[0].response.g_yahr_date, cal.g_yahr_date)
+            assert.equal(newJson[0].response.month_number, cal.month_number)
         })
     })
 })
