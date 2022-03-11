@@ -2,7 +2,6 @@ import {assessMonthFilterValidity, makeDate, getYahr, mapResponses} from '../lib
 import {HDate, greg} from '@hebcal/core';
 import assert from 'assert'
 import sinon from 'sinon'
-import promptInit from "prompt-sync"
 import {OBSERVATION_SELECTION, GREGORIAN_CAL, HEBREW_CAL, GREGORIAN_DATE_OF_PASSING, SUNSET_SELECTION, BEFORE_SUNSET, AFTER_SUNSET, UNSURE_SUNSET} from '../lib/form_constants.js'
 
 describe('assessMonthFilterValidity', () => {
@@ -43,23 +42,23 @@ describe('getYahr during a non-leap year', () => {
     })
     it('Returns next occurance of hebrew equivalent of a past gregorian date', async () => {
         // 11th of Nissan (future)
-        assert.deepEqual(getYahr(new HDate(11, 1, 5742)), new Date(2023, 3, 2))
-        // 18th of Adar I (future)
-        assert.deepEqual(getYahr(new HDate(18, 12, 5781)), new Date(2023, 2, 11))
-        // 1st of Tishrei (already happened this herbrew year, but not this gregorian year)
-        assert.deepEqual(getYahr(new HDate(1, 7, 5782)), new Date(2023, 8, 16))
+        assert.deepEqual(getYahr(new HDate(11, 1, 5742)), new HDate(11, 1, 5783))
+        // // 18th of Adar I (future)
+        assert.deepEqual(getYahr(new HDate(18, 12, 5781)), new HDate(18, 12, 5783))
+        // // 1st of Tishrei (already happened this herbrew year, but not this gregorian year)
+        assert.deepEqual(getYahr(new HDate(1, 7, 5782)), new HDate(1, 7, 5784))
     })
     it('Future dates are treated the same as past dates', async () => {
         // 1st of Tishrei in a future Hebrew year
-        assert.deepEqual(getYahr(new HDate(1, 7, 5785)), new Date(2023, 8, 16))
+        assert.deepEqual(getYahr(new HDate(1, 7, 5785)), new HDate(1, 7, 5784))
     })
     it('Today is considered a next occurance', async () => {
         // 8th of Tevet (= Jan 1, 2023)
-        assert.deepEqual(getYahr(new HDate(8, 10, 5742)), new Date(2023, 0, 1))
+        assert.deepEqual(getYahr(new HDate(8, 10, 5742)), new HDate(8, 10, 5783))
     })
     it('Adar II dates are no problem. (Observed in Adar)', async () => {
         // 12th of Adar II
-        assert.deepEqual(getYahr(new HDate(12, 13, 5779)), new Date(2023, 2, 5))
+        assert.deepEqual(getYahr(new HDate(12, 13, 5779)), new HDate(12, 12, 5783))
     })
 })
 
@@ -74,11 +73,11 @@ describe('getYahr during a leap year', () => {
     })
     it('Adar dates return as Adar I', async () => {
         // 18th of Adar
-        assert.deepEqual(getYahr(new HDate(18, 12, 5781)), new Date(2022, 1, 19))
+        assert.deepEqual(getYahr(new HDate(18, 12, 5781)), new HDate(18, 12, 5782))
     })
     it('Adar II dates return as Adar II', async () => {
         // 12th of Adar II
-        assert.deepEqual(getYahr(new HDate(12, 13, 5779)), new Date(2022, 2, 15))
+        assert.deepEqual(getYahr(new HDate(12, 13, 5779)), new HDate(12, 13, 5782))
     })
 })
 

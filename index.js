@@ -12,9 +12,9 @@ const run = async () => {
     }
     const json = await fetchYahrzeitFormEntries()
     // const json = await loadYahrzeitFormEntries()
-    // saveToCSV(mapResponses(json))
-    const filteredForms = filterResponses(mapResponses(json), monthFilter)
-    console.log(`Filter month = ${monthFilter}`)
+    saveToCSV(mapResponses(json))
+    const filteredForms = mapResponses(json).filter(form => form.response.month_number === monthFilter)
+    console.log(`Number of results = ${filteredForms.length}`)
 
 }
 
