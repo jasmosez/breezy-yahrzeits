@@ -19,6 +19,10 @@ const loggingFilteredForms = (filteredForms) => {
     `))
     console.log(`Number of results = ${filteredForms.length}`)
 }
+
+
+
+
 const run = async () => {
     const monthFilter = getInput()
     if (!monthFilter) {
@@ -27,11 +31,22 @@ const run = async () => {
     }
     const json = await fetchYahrzeitFormEntries()
     // const json = await loadYahrzeitFormEntries()
-    saveToCSV(mapResponses(json))
-    const filteredForms = mapResponses(json).filter(form => form.response.month_number === monthFilter)
     
-    //optional
+    //filtered
+    const filteredForms = mapResponses(json).filter(form => form.response.month_number === monthFilter)
     loggingFilteredForms(filteredForms)
+
+    
+    // dump text for email
+    //1. grouped by shabbat -> the preceding week?
+    //2. <Mourner>, <relationship> of <deceased>
+    
+    
+    // user check in 
+    // 1. save everything to a PDF
+    saveToCSV(mapResponses(json))
+    // 2. prompt user to review and continue with email or not
+    // 3. send emails
 
 
 
