@@ -27,6 +27,9 @@ const run = async () => {
         process.exit()
     }
     const json = await fetchYahrzeitFormEntries()
+    console.log(json)
+    // NEED ERROR HANDLING
+    
     // const json = await loadYahrzeitFormEntries()
     
     //filtered
