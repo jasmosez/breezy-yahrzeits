@@ -20,9 +20,6 @@ const loggingFilteredForms = (filteredForms) => {
     console.log(`Number of results = ${filteredForms.length}`)
 }
 
-
-
-
 const run = async () => {
     const monthFilter = getInput()
     if (!monthFilter) {
