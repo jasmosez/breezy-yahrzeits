@@ -3,6 +3,7 @@ import {getInput,
         loadYahrzeitFormEntries, 
         mapResponses, 
         saveToCSV} from './lib/dataCollection.js'
+// import {}
 import { EMAIL, ENGLISH_NAME_DECEASED, FIRST_NAME_MOURNER, PROFILE, RELATIONSHIP } from './lib/form_constants.js'
 
 const loggingFilteredForms = (filteredForms) => {
@@ -37,9 +38,11 @@ const run = async () => {
     loggingFilteredForms(filteredForms)
 
     
-    // dump text for email
+    // dump text for shabbat email
+    //0. objects with mourner, realationsip, deceased, yahr date
+    
     //1. grouped by shabbat -> the preceding week?
-    //2. <Mourner>, <relationship> of <deceased>
+    //2. <Mourner>, <relationship> of <deceased> (<greg yahrzeit date>)
     
     
     // user check in 
