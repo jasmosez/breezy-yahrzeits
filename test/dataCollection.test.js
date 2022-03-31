@@ -1,26 +1,35 @@
-import {assessMonthFilterValidity, makeDate, getYahr, mapResponses} from '../lib/dataCollection.js'
+import {monthFilterInvalid, makeDate, getYahr, mapResponses} from '../lib/dataCollection.js'
 import {HDate, greg} from '@hebcal/core';
 import assert from 'assert'
 import sinon from 'sinon'
 import {OBSERVATION_SELECTION, GREGORIAN_CAL, HEBREW_CAL, GREGORIAN_DATE_OF_PASSING, SUNSET_SELECTION, BEFORE_SUNSET, AFTER_SUNSET, UNSURE_SUNSET} from '../lib/form_constants.js'
 
-describe('assessMonthFilterValidity', () => {
 
-    it('Accepts strings representing numbers between 1 and 12', ()=>{
-        assert.equal(assessMonthFilterValidity('1'), 1)
-        assert.equal(assessMonthFilterValidity('12'), 12)
-    })
-    it('Does not accept strings representing numbers less than 1 or more than 12', ()=>{
-        assert.equal(assessMonthFilterValidity('0'), false)
-        assert.equal(assessMonthFilterValidity('13'), false)
-    })
-    it('Does not accept strings that cannot be parsed to an integer', ()=>{
-        assert.equal(assessMonthFilterValidity('hello'), false)
-    })
-    it('Parses decimals to their rounded-downinteger', ()=>{
-        assert.equal(assessMonthFilterValidity('1.1'), 1)
+describe('getValidMonthFilter', () => {
+    // TO DO 
+    it('returns an integer', ()=>{
+        assert(true)
     })
 })
+
+describe('monthFilterInvalid', () => {
+
+    it('Strings representing numbers between 1 and 12 are valid', ()=>{
+        assert.equal(monthFilterInvalid('1'), false)
+        assert.equal(monthFilterInvalid('12'), false)
+    })
+    it('Strings representing numbers less than 1 or more than 12 are invalid', ()=>{
+        assert.equal(monthFilterInvalid('0'), true)
+        assert.equal(monthFilterInvalid('13'), true)
+    })
+    it('Strings that cannot be parsed to an integer are invalid', ()=>{
+        assert.equal(monthFilterInvalid('hello'), true)
+    })
+    it('Decimals are invalid', ()=>{
+        assert.equal(monthFilterInvalid('1.1'), true)
+    })
+})
+
 
 describe('makeDate', () => {
     it('returns Date from "mm/dd/yyyy"', ()=>{
@@ -30,6 +39,7 @@ describe('makeDate', () => {
         assert.deepEqual(makeDate('1982-04-19'), new Date('1982', 3, 19))
     })
 })
+
 
 describe('getYahr during a non-leap year', () => {
     before(() => {
@@ -62,6 +72,7 @@ describe('getYahr during a non-leap year', () => {
     })
 })
 
+
 describe('getYahr during a leap year', () => {
     beforeEach(() => {
         // Gregorian year 2022 begins in the midst of 5782 (a leap year!)
@@ -80,6 +91,7 @@ describe('getYahr during a leap year', () => {
         assert.deepEqual(getYahr(new HDate(12, 13, 5779)), new HDate(12, 13, 5782))
     })
 })
+
 
 describe('mapResponses', () => {
     before(() => {
