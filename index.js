@@ -1,5 +1,6 @@
-import { getValidMonthFilter, fetchYahrzeitFormEntries, loadYahrzeitFormEntries, logFilteredForms, mapResponses, saveToCSV} from './lib/dataCollection.js'
+import { getValidMonthFilter, fetchYahrzeitFormEntries, loadYahrzeitFormEntries, mapResponses, saveToCSV} from './lib/dataCollection.js'
 import {saveToText} from './lib/weeklyList.js'
+import {sendEmails} from './lib/mail.js'
 import promptInit from "prompt-sync"
 
 const confirmPrompt = (savedCSV, savedTXT) => {
@@ -24,12 +25,6 @@ const confirmPrompt = (savedCSV, savedTXT) => {
         console.log('')
     }
 
-}
-
-const sendEmails = (filteredForms) => {
-    console.log('_________________________________________________________________')
-    console.log('Sending Emails...')
-    logFilteredForms(filteredForms)
 }
 
 const run = async () => {
