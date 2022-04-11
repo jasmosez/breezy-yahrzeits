@@ -1,4 +1,4 @@
-import { getValidMonthFilter, fetchYahrzeitFormEntries, loadYahrzeitFormEntries, mapResponses, saveToCSV} from './lib/dataCollection.js'
+import { mapFilterMap, getValidMonthFilter, fetchYahrzeitFormEntries, saveToCSV} from './lib/dataCollection.js'
 import {saveToText} from './lib/weeklyList.js'
 import {sendEmails} from './lib/mail.js'
 import promptInit from "prompt-sync"
@@ -32,8 +32,8 @@ const run = async () => {
  
     // Get and filter forms
     const json = await fetchYahrzeitFormEntries() // NEED ERROR HANDLING
-    const filteredForms = mapResponses(json).filter(form => form.response.month_number === monthFilter)
-    
+    const filteredForms = await mapFilterMap(monthFilter, json)
+
     // dump to csv
     const savedCSV = await saveToCSV(filteredForms)
 
