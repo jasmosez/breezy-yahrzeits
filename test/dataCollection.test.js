@@ -50,7 +50,7 @@ describe('getYahr during a non-leap year', () => {
     after(() => {
         sinon.restore()
     })
-    it('Returns next occurance of hebrew equivalent of a past gregorian date', async () => {
+    it('Returns next occurance of hebrew equivalent of a past gregorian date', () => {
         // 11th of Nissan (future)
         assert.deepEqual(getYahr(new HDate(11, 1, 5742)), new HDate(11, 1, 5783))
         // // 18th of Adar I (future)
@@ -58,15 +58,14 @@ describe('getYahr during a non-leap year', () => {
         // // 1st of Tishrei (already happened this herbrew year, but not this gregorian year)
         assert.deepEqual(getYahr(new HDate(1, 7, 5782)), new HDate(1, 7, 5784))
     })
-    it('Future dates are treated the same as past dates', async () => {
-        // 1st of Tishrei in a future Hebrew year
-        assert.deepEqual(getYahr(new HDate(1, 7, 5785)), new HDate(1, 7, 5784))
+    it('Future dates cause an error', () => {
+        assert.throws(() => getYahr(new HDate(1, 7, 5785)), RangeError);
     })
-    it('Today is considered a next occurance', async () => {
+    it('Today is considered a next occurance', () => {
         // 8th of Tevet (= Jan 1, 2023)
         assert.deepEqual(getYahr(new HDate(8, 10, 5742)), new HDate(8, 10, 5783))
     })
-    it('Adar II dates are no problem. (Observed in Adar)', async () => {
+    it('Adar II dates are no problem. (Observed in Adar)', () => {
         // 12th of Adar II
         assert.deepEqual(getYahr(new HDate(12, 13, 5779)), new HDate(12, 12, 5783))
     })
