@@ -14,12 +14,13 @@ describe('getValidMonthFilter', () => {
 
 describe('monthFilterInvalid', () => {
 
-    it('Strings representing numbers between 1 and 12 are valid', ()=>{
+    it('Strings representing numbers between 0 and 12 are valid', ()=>{
+        assert.equal(monthFilterInvalid('0'), false)
         assert.equal(monthFilterInvalid('1'), false)
         assert.equal(monthFilterInvalid('12'), false)
     })
-    it('Strings representing numbers less than 1 or more than 12 are invalid', ()=>{
-        assert.equal(monthFilterInvalid('0'), true)
+    it('Strings representing numbers less than 0 or more than 12 are invalid', ()=>{
+        assert.equal(monthFilterInvalid('-1'), true)
         assert.equal(monthFilterInvalid('13'), true)
     })
     it('Strings that cannot be parsed to an integer are invalid', ()=>{
@@ -27,6 +28,10 @@ describe('monthFilterInvalid', () => {
     })
     it('Decimals are invalid', ()=>{
         assert.equal(monthFilterInvalid('1.1'), true)
+    })
+    it('Null and undefined are invalid', ()=>{
+        assert.equal(monthFilterInvalid(null), true)
+        assert.equal(monthFilterInvalid(undefined), true)
     })
 })
 

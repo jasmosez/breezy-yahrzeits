@@ -37,12 +37,15 @@ const run = async () => {
     // dump to csv
     const savedCSV = await saveToCSV(filteredForms)
 
-    // dump text for shabbat email
-    const savedTXT = saveToText(monthFilter, filteredForms)
-    
-    // prompt user to review and continue with email or not
-    if (confirmPrompt(savedCSV, savedTXT)) {
-        sendEmails(filteredForms)
+    // if monthFilter == 0, end here
+    if (!!monthFilter) {
+        // dump text for shabbat email
+        const savedTXT = saveToText(monthFilter, filteredForms)
+        
+        // prompt user to review and continue with email or not
+        if (confirmPrompt(savedCSV, savedTXT)) {
+            sendEmails(filteredForms)
+        }
     }
 
 }
