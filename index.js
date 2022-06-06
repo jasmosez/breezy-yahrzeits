@@ -3,7 +3,7 @@ import {saveToText} from './lib/weeklyList.js'
 import {sendEmails} from './lib/mail.js'
 import promptInit from "prompt-sync"
 
-const confirmPrompt = (savedCSV, savedTXT) => {
+const confirmPrompt = (savedCSV, savedTXT, emailCount) => {
     const prompt = promptInit()
 
     console.log('_________________________________________________________________')
@@ -12,6 +12,7 @@ const confirmPrompt = (savedCSV, savedTXT) => {
     console.log(``)
     console.log(`Please review both files.`)
     console.log(`If everything looks right, we'll send the emails to the mourners.`)
+    console.log(`THERE ARE ${emailCount} EMAILS TO SEND.`)
     const response = prompt(`Type "Send Emails" to confirm: `)
     console.log(``)
 
@@ -43,7 +44,7 @@ const run = async () => {
         const savedTXT = saveToText(monthFilter, filteredForms)
         
         // prompt user to review and continue with email or not
-        if (confirmPrompt(savedCSV, savedTXT)) {
+        if (confirmPrompt(savedCSV, savedTXT, filteredForms.length)) {
             sendEmails(filteredForms)
         }
     }
