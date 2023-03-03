@@ -60,8 +60,10 @@ describe('getYahr during a non-leap year', () => {
         assert.deepEqual(getYahr(new HDate(11, 1, 5742)), new HDate(11, 1, 5783))
         // // 18th of Adar I (future)
         assert.deepEqual(getYahr(new HDate(18, 12, 5781)), new HDate(18, 12, 5783))
-        // // 1st of Tishrei (already happened this herbrew year, but not this gregorian year)
+        // // 1st of Tishrei (past)
         assert.deepEqual(getYahr(new HDate(1, 7, 5782)), new HDate(1, 7, 5784))
+        // 7 Kislev (already happened this herbrew year, but not this gregorian year)
+        assert.deepEqual(getYahr(new HDate(7, 9, 5783)), new HDate (7, 9, 5784))
     })
     it('Future dates cause an error', () => {
         assert.throws(() => getYahr(new HDate(1, 7, 5785)), RangeError);

@@ -43,8 +43,8 @@ describe('determineTargetYear', () => {
     it("if target month is prior to today's month, target month is next year", ()=>{
         assert.equal(determineTargetYear(prior), thisYear + 1)
     })
-    it("if target month is today's month, target month is next year", ()=>{
-        assert.equal(determineTargetYear(thisMonth), thisYear + 1)
+    it("if target month is today's month, target month is this year", ()=>{
+        assert.equal(determineTargetYear(thisMonth), thisYear)
     })
     it("if target month is after to today's month, target month is this year", ()=>{
         assert.equal(determineTargetYear(later), thisYear)
