@@ -1,6 +1,7 @@
 import { mapFilterMap, getValidMonthFilter, fetchYahrzeitFormEntries, saveToCSV} from './lib/dataCollection.js'
 import {saveToText} from './lib/weeklyList.js'
 import {sendEmails} from './lib/mail.js'
+import { MEMBER } from './lib/form_constants.js'
 import promptInit from "prompt-sync"
 
 const confirmPrompt = (savedCSV, savedTXT, emailCount) => {
@@ -42,10 +43,11 @@ const run = async () => {
     if (!!monthFilter) {
         // dump text for shabbat email
         const savedTXT = saveToText(monthFilter, filteredForms)
-        
+                
         // prompt user to review and continue with email or not
-        if (confirmPrompt(savedCSV, savedTXT, filteredForms.length)) {
-            sendEmails(filteredForms)
+        const justMembers = filteredForms.filter(form => form.member_status === MEMBER)
+        if (confirmPrompt(savedCSV, savedTXT, justMembers.length)) {
+            sendEmails(justMembers)
         }
     }
 
