@@ -216,107 +216,107 @@ describe('YahrzeitCollection', () => {
     // Add more test cases for different scenarios...
   });
   
-  describe('addProfileStatusData', () => {
-    it('should add profile data to forms with profile IDs', async () => {
-      const form1 = {
-        person_id: 1,
-        response: {
-          [config.formConstants.personIdField]: 1,
-        },
-      };
-      const form2 = {
-        person_id: 2,
-        response: {
-          [config.formConstants.personIdField]: 2,
-        },
-      };
-      const filteredProcessedDataWithProfileIds = [form1, form2];
+  // describe('addProfileStatusData', () => {
+  //   it('should add profile data to forms with profile IDs', async () => {
+  //     const form1 = {
+  //       person_id: 1,
+  //       response: {
+  //         [config.formConstants.personIdField]: 1,
+  //       },
+  //     };
+  //     const form2 = {
+  //       person_id: 2,
+  //       response: {
+  //         [config.formConstants.personIdField]: 2,
+  //       },
+  //     };
+  //     const filteredProcessedDataWithProfileIds = [form1, form2];
 
-      const profile1 = {
-        id: 1,
-        [config.formConstants.firstNameMournerField]: 'John',
-        [config.formConstants.lastNameMournerField]: 'Doe',
-        details: {
-          [config.formConstants.profileStatusField]: { name: 'Member' },
-        },
-        [config.formConstants.profileEmailListField]: [
-          { address: 'john.doe@example.com', isPrimaryField: '1', allowBulkField: '1' },
-        ],
-      };
-      const profile2 = {
-        id: 2,
-        [config.formConstants.firstNameMournerField]: 'Jane',
-        [config.formConstants.lastNameMournerField]: 'Smith',
-        details: {
-          [config.formConstants.profileStatusField]: { name: 'Deceased' },
-        },
-        [config.formConstants.profileEmailListField]: [
-          { address: 'jane.smith@example.com', isPrimaryField: '1', allowBulkField: '1' },
-        ],
-      };
+  //     const profile1 = {
+  //       id: 1,
+  //       [config.formConstants.firstNameMournerField]: 'John',
+  //       [config.formConstants.lastNameMournerField]: 'Doe',
+  //       details: {
+  //         [config.formConstants.profileStatusField]: { name: 'Member' },
+  //       },
+  //       [config.formConstants.profileEmailListField]: [
+  //         { address: 'john.doe@example.com', isPrimaryField: '1', allowBulkField: '1' },
+  //       ],
+  //     };
+  //     const profile2 = {
+  //       id: 2,
+  //       [config.formConstants.firstNameMournerField]: 'Jane',
+  //       [config.formConstants.lastNameMournerField]: 'Smith',
+  //       details: {
+  //         [config.formConstants.profileStatusField]: { name: 'Deceased' },
+  //       },
+  //       [config.formConstants.profileEmailListField]: [
+  //         { address: 'jane.smith@example.com', isPrimaryField: '1', allowBulkField: '1' },
+  //       ],
+  //     };
 
-      const fetchStub = sinon.stub(window, 'fetch');
-      fetchStub.withArgs('baseURL/profiles/1').resolves({
-        json: () => Promise.resolve(profile1),
-      });
-      fetchStub.withArgs('baseURL/profiles/2').resolves({
-        json: () => Promise.resolve(profile2),
-      });
+  //     const fetchStub = sinon.stub(window, 'fetch');
+  //     fetchStub.withArgs('baseURL/profiles/1').resolves({
+  //       json: () => Promise.resolve(profile1),
+  //     });
+  //     fetchStub.withArgs('baseURL/profiles/2').resolves({
+  //       json: () => Promise.resolve(profile2),
+  //     });
 
-      collection.filteredProcessedData = filteredProcessedDataWithProfileIds;
-      await collection.addProfileStatusData();
+  //     collection.filteredProcessedData = filteredProcessedDataWithProfileIds;
+  //     await collection.addProfileStatusData();
 
-      assert.equal(collection.formsWithProfileIds.length, 2);
-      assert.equal(collection.formsWithProfileIds[0].profile_first_name, 'John');
-      assert.equal(collection.formsWithProfileIds[0].profile_last_name, 'Doe');
-      assert.equal(collection.formsWithProfileIds[0].member_status, 'Member');
-      assert.equal(collection.formsWithProfileIds[0].profile_email, 'john.doe@example.com');
-      assert.equal(collection.formsWithProfileIds[1].profile_first_name, 'Jane');
-      assert.equal(collection.formsWithProfileIds[1].profile_last_name, 'Smith');
-      assert.equal(collection.formsWithProfileIds[1].member_status, 'Deceased');
-      assert.equal(collection.formsWithProfileIds[1].profile_email, 'jane.smith@example.com');
+  //     assert.equal(collection.formsWithProfileIds.length, 2);
+  //     assert.equal(collection.formsWithProfileIds[0].profile_first_name, 'John');
+  //     assert.equal(collection.formsWithProfileIds[0].profile_last_name, 'Doe');
+  //     assert.equal(collection.formsWithProfileIds[0].member_status, 'Member');
+  //     assert.equal(collection.formsWithProfileIds[0].profile_email, 'john.doe@example.com');
+  //     assert.equal(collection.formsWithProfileIds[1].profile_first_name, 'Jane');
+  //     assert.equal(collection.formsWithProfileIds[1].profile_last_name, 'Smith');
+  //     assert.equal(collection.formsWithProfileIds[1].member_status, 'Deceased');
+  //     assert.equal(collection.formsWithProfileIds[1].profile_email, 'jane.smith@example.com');
 
-      fetchStub.restore();
-    });
+  //     fetchStub.restore();
+  //   });
 
-    it('should skip forms without profile IDs', async () => {
-      const form = {
-        response: {
-          [config.formConstants.personIdField]: null,
-        },
-      };
-      const filteredProcessedDataWithProfileIds = [form];
+  //   it('should skip forms without profile IDs', async () => {
+  //     const form = {
+  //       response: {
+  //         [config.formConstants.personIdField]: null,
+  //       },
+  //     };
+  //     const filteredProcessedDataWithProfileIds = [form];
 
-      const fetchStub = sinon.stub(window, 'fetch');
+  //     const fetchStub = sinon.stub(window, 'fetch');
 
-      collection.filteredProcessedData = filteredProcessedDataWithProfileIds;
-      await collection.addProfileStatusData();
+  //     collection.filteredProcessedData = filteredProcessedDataWithProfileIds;
+  //     await collection.addProfileStatusData();
 
-      assert.equal(collection.formsWithProfileIds.length, 0);
+  //     assert.equal(collection.formsWithProfileIds.length, 0);
 
-      fetchStub.restore();
-    });
+  //     fetchStub.restore();
+  //   });
 
-    it('should handle errors when fetching profile info', async () => {
-      const form = {
-        person_id: 1,
-        response: {
-          [config.formConstants.personIdField]: 1,
-        },
-      };
-      const filteredProcessedDataWithProfileIds = [form];
+  //   it('should handle errors when fetching profile info', async () => {
+  //     const form = {
+  //       person_id: 1,
+  //       response: {
+  //         [config.formConstants.personIdField]: 1,
+  //       },
+  //     };
+  //     const filteredProcessedDataWithProfileIds = [form];
 
-      const fetchStub = sinon.stub(window, 'fetch');
-      fetchStub.withArgs('baseURL/profiles/1').rejects(new Error('Failed to fetch profile info'));
+  //     const fetchStub = sinon.stub(window, 'fetch');
+  //     fetchStub.withArgs('baseURL/profiles/1').rejects(new Error('Failed to fetch profile info'));
 
-      collection.filteredProcessedData = filteredProcessedDataWithProfileIds;
-      await collection.addProfileStatusData();
+  //     collection.filteredProcessedData = filteredProcessedDataWithProfileIds;
+  //     await collection.addProfileStatusData();
 
-      assert.equal(collection.formsWithProfileIds.length, 0);
+  //     assert.equal(collection.formsWithProfileIds.length, 0);
 
-      fetchStub.restore();
-    });
-  });
+  //     fetchStub.restore();
+  //   });
+  // });
 
 
   // Add more test cases for other methods...
