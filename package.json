@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "node index.js",
+    "start": "node index2.js",
     "test": "mocha"
   },
   "author": "James Schaffer",
@@ -20,6 +20,7 @@
     "prompt-sync": "^4.2.0"
   },
   "devDependencies": {
+    "@types/prompt-sync": "^4.2.3",
     "mocha": "^9.2.0",
     "sinon": "^13.0.1"
   }
