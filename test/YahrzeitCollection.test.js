@@ -1,6 +1,7 @@
 import { YahrzeitCollection } from '../lib/YahrzeitCollection.js';
 import { HDate } from '@hebcal/core';
 import { config } from '../config.js';
+import { UserInterface } from '../lib/UserInterface.js';
 import assert from 'assert'
 import sinon from 'sinon'
 
@@ -89,44 +90,10 @@ describe('YahrzeitCollection', () => {
     
   });
 
-  describe('determineTargetYear', () => {
-    before(() => {
-      const now = new Date(2024, 1, 25);
-      sinon.useFakeTimers(now.getTime());
-    });
-
-    after(() => {
-        sinon.restore()
-    })
-    it('returns the current year if the selected month is in the future', () => {
-      const monthFilter = 3;
-      const today = new Date();
-      const expectedYear = today.getFullYear();
-      const result = collection.determineTargetYear(monthFilter);
-      assert.equal(result, expectedYear);
-    });
-    
-    it('returns the current year if the selected month is the current month', () => {
-      const monthFilter = 2;
-      const today = new Date();
-      const expectedYear = today.getFullYear();
-      const result = collection.determineTargetYear(monthFilter);
-      assert.equal(result, expectedYear);
-    });
-
-    it('returns the next year if the selected month has passed', () => {
-      const monthFilter = 1;
-      const today = new Date();
-      const expectedYear = today.getFullYear() + 1;
-      const result = collection.determineTargetYear(monthFilter);
-      assert.equal(result, expectedYear);
-    });
-  });
-
   describe('applyMonthFilter', () => {
     it('returns all forms if the month filter is 0', () => {
       const monthFilter = 0;
-      const unfilteredData = [{ response: { month_number: 1, year: 2022 } }, { response: { month_number: 2, year: 2022 } }];
+      const unfilteredData = [{ month_number: 1, year: 2022 }, { month_number: 2, year: 2022 }];
       collection.processedData = unfilteredData;
       collection.applyMonthFilter(monthFilter);
       assert.deepEqual(collection.filteredProcessedData, unfilteredData);
@@ -135,15 +102,14 @@ describe('YahrzeitCollection', () => {
     it('returns forms that match the month filter', () => {
       const monthFilter = 2;
       const unfilteredData = [
-        { response: { month_number: 1, year: 2022 } },
-        { response: { month_number: 2, year: 2022 } },
-        { response: { month_number: 3, year: 2022 } },
+        { month_number: 1, year: 2022 },
+        { month_number: 2, year: 2022 },
+        { month_number: 3, year: 2022 },
       ];
-      const expectedFilteredData = [{ response: { month_number: 2, year: 2022 } }];
+      const expectedFilteredData = [{ month_number: 2, year: 2022 }];
 
-      collection.determineTargetYear = () => 2022;
       collection.processedData = unfilteredData;
-      collection.applyMonthFilter(monthFilter);
+      collection.applyMonthFilter(monthFilter, 2022);
       assert.deepEqual(collection.filteredProcessedData, expectedFilteredData);
     });
   });

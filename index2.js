@@ -1,4 +1,4 @@
-import { UserInterface } from './lib/userInterface.js'
+import { UserInterface } from './lib/UserInterface.js'
 import { YahrzeitCollection } from './lib/YahrzeitCollection.js'
 
 
