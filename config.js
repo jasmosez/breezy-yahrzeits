@@ -23,6 +23,8 @@ export const config = {
         beforeSunsetOption: process.env.BEFORE_SUNSET,
         afterSunsetOption: process.env.AFTER_SUNSET,
         unsureSunsetOption: process.env.UNSURE_SUNSET,
+        relationshipField: process.env.RELATIONSHIP,
+        englishNameDeceasedField: process.env.ENGLISH_NAME_DECEASED,
 
         // profileField: process.env.PROFILE,
         personIdField: 'person_id',
