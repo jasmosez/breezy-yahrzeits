@@ -12,21 +12,13 @@ const run = async () => {
         members
     } = await YahrzeitCollection.createYahrzeitCollection(ui);
     
-    ui.saveToCSV(formsWithProfileIds)
+    await ui.saveToCSV(formsWithProfileIds)
     if (ui.targetMonth !== 0) {
         ui.saveToText(membersAndDeceased.sort(YahrzeitCollection.sortByYahrzeitAsc))
-        ui.sendEmails(members)
+        await ui.sendEmails(members)
     }
 
-
-    // if monthFilter == 0, end here
-    if (ui.targetMonth !== 0 ) {
-        // prompt user to review and continue with email or not
-        const justMembers = filteredForms.filter(form => form.member_status === MEMBER)
-        if (confirmPrompt(savedCSV, savedTXT, justMembers.length)) {
-            sendEmails(justMembers)
-        }
-    }
+    ui.showMessage(ui._goodbye)
 
 }
 
