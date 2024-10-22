@@ -1,46 +1,65 @@
 // Load environment variables from a .env file
 import {} from 'dotenv/config'
+import nodemailer from 'nodemailer'
 
-// Set default options
-export const config = {
-    smtp: {
+// Define the smtp configuration object
+let smtp
+if (process.env.ENV === 'PRODUCTION') {
+    smtp = {
         host: process.env.HOST,
         port: process.env.PORT,
-        username: process.env.USERNAME,
-        password: process.env.PASSWORD,
-    },
+        auth: {
+            user: process.env.USERNAME,
+            pass: process.env.PASSWORD
+        }
+    }
+} else {
+    const testAccount = await nodemailer.createTestAccount();
+    smtp = {
+        host: testAccount.smtp.host,
+        port: testAccount.smtp.port,
+        secure: testAccount.smtp.secure,
+        auth: {
+            user: testAccount.user,
+            pass: testAccount.pass
+        }
+    }
+}
+
+// form constant mapping based on form id
+const formMap = {
+    572588: {
+        observanceField: '2092221479',
+        gregorianCalendarOption: '403',
+        hebrewCalendarOption: '404',
+        gregorianDateOfPassingField: '2092221480',
+        sunsetField: '2092221488',
+        beforeSunsetOption: '757',
+        afterSunsetOption: '758',
+        unsureSunsetOption: '759',
+        relationshipField: '2092221477',
+        englishNameDeceasedField: '2092221474',
+        profileStatusField: '2092220507',
+        profileEmailListField: '1684609214',
+    }
+}
+
+
+export const config = {
     breeze: {
         subdomain: process.env.BREEZE_SUBDOMAIN,
         apiKey: process.env.BREEZE_API,
         formId: process.env.BREEZE_FORM_ID,
     },
+    envIsProduction: process.env.ENV === 'PRODUCTION',
     formConstants: {
-        observanceField: process.env.OBSERVATION_SELECTION,
-        gregorianCalendarOption: process.env.GREGORIAN_CAL,
-        hebrewCalendarOption: process.env.HEBREW_CAL,
-        gregorianDateOfPassingField: process.env.GREGORIAN_DATE_OF_PASSING,
-        sunsetField: process.env.SUNSET_SELECTION,
-        beforeSunsetOption: process.env.BEFORE_SUNSET,
-        afterSunsetOption: process.env.AFTER_SUNSET,
-        unsureSunsetOption: process.env.UNSURE_SUNSET,
-        relationshipField: process.env.RELATIONSHIP,
-        englishNameDeceasedField: process.env.ENGLISH_NAME_DECEASED,
-
-        // profileField: process.env.PROFILE,
+        ...formMap[process.env.BREEZE_FORM_ID],
         personIdField: 'person_id',
         firstNameMournerField: 'first_name',
         lastNameMournerField: 'last_name',
-        profileStatusField: process.env.PROFILE_STATUS,
-        profileEmailListField: process.env.PROFILE_EMAIL_LIST,
         isPrimaryField: 'is_primary',
         allowBulkField: 'allow_bulk',
-
-        // relationshipField: process.env.RELATIONSHIP,
-        // englishNameDeceasedField: process.env.ENGLISH_NAME_DECEASED,
-        // member: 'Member',
-        // deceased: 'Deceased',
-        // emailField: process.env.EMAIL,
-    }
-  // Add more options here
+    },
+    smtp: smtp,
 };
 
