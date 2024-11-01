@@ -42,6 +42,21 @@ const formMap = {
         profileStatusField: '2092220507',
         profileEmailListField: '1684609214',
         currentMemberTag: '2974904'
+    },
+    572624: {
+        observanceField: '2092221500',
+        gregorianCalendarOption: '403',
+        hebrewCalendarOption: '404',
+        gregorianDateOfPassingField: '2092221501',
+        sunsetField: '2092221502',
+        beforeSunsetOption: '757',
+        afterSunsetOption: '758',
+        unsureSunsetOption: '759',
+        relationshipField: '2092221498',
+        englishNameDeceasedField: '2092221495',
+        profileStatusField: '2092220507',
+        profileEmailListField: '1684609214',
+        currentMemberTag: '2974904'
     }
 }
 
