@@ -41,6 +41,7 @@ const formMap = {
         englishNameDeceasedField: '2092221474',
         profileStatusField: '2092220507',
         profileEmailListField: '1684609214',
+        currentMemberTag: '2974904'
     }
 }
 
@@ -51,6 +52,7 @@ export const config = {
         apiKey: process.env.BREEZE_API,
         formId: process.env.BREEZE_FORM_ID,
     },
+    emailTemplate: process.env.EMAIL_TEMPLATE || './sample_email_template.js',
     envIsProduction: process.env.ENV === 'PRODUCTION',
     formConstants: {
         ...formMap[process.env.BREEZE_FORM_ID],

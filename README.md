@@ -8,7 +8,7 @@ It will dump two files:
 1. CSV of filtered yahrzeit form responses (members only)
 2. Text file of those yahrzeits by week (members and deceased members)
 
-Then, it will ask if you want to email the mourners. If so, it will use `email_template.js` for the contents.
+Then, it will ask if you want to email the mourners. If so, it will use `sample_email_template.js`, or another specified file, for the contents.
 
 ## Getting this up and running on a local machine
 
