@@ -1,7 +1,11 @@
 node_modules/
+
 forms*.csv
+yahrzeit*.csv
+yahrzeit*.txt
 shabbat_text.txt
-credentials.json
-source_forms*
+
+lib/email_templates/*
+
 .env
 .DS_Store

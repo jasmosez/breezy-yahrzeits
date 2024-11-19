@@ -26,6 +26,15 @@ if (process.env.ENV === 'PRODUCTION') {
     }
 }
 
+const emailTemplateFile = process.env.EMAIL_TEMPLATE_FILE || './lib/sample_email_template.js';
+let emailTemplate;
+try {
+  emailTemplate = await import(emailTemplateFile);
+} catch (error) {
+  console.error(`Failed to load email template file: ${emailTemplateFile}`, error);
+  process.exit(1);
+}
+
 // form constant mapping based on form id
 const formMap = {
     572588: {
@@ -67,7 +76,7 @@ export const config = {
         apiKey: process.env.BREEZE_API,
         formId: process.env.BREEZE_FORM_ID,
     },
-    emailTemplate: process.env.EMAIL_TEMPLATE || './sample_email_template.js',
+    emailTemplate: emailTemplate,
     envIsProduction: process.env.ENV === 'PRODUCTION',
     formConstants: {
         ...formMap[process.env.BREEZE_FORM_ID],
