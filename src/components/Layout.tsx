@@ -29,9 +29,9 @@ export default function Layout({ children }: LayoutProps) {
             </Link>
           </div>
           <div className="nav-links">
-            <Link href="/dashboard" className="nav-link">
+            {/* <Link href="/dashboard" className="nav-link">
               Dashboard
-            </Link>
+            </Link> */}
             <button onClick={handleLogout} className="button">
               Logout
             </button>
