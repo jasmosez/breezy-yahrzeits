@@ -2,26 +2,36 @@
   "name": "breezy-yahrzeits",
   "version": "0.1.0",
   "description": "Utilities for delivering Yahrzeit functionality for Breeze users",
-  "main": "index.js",
-  "type": "module",
   "scripts": {
-    "start": "node index2.js",
-    "test": "mocha"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "test": "jest",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev"
   },
   "author": "James Schaffer",
   "license": "MIT",
   "dependencies": {
     "@hebcal/core": "^3.33.2",
+    "@prisma/client": "latest",
     "dotenv": "^16.0.0",
     "googleapis": "^94.0.0",
     "json-2-csv": "^3.16.1",
+    "next": "latest",
     "node-fetch": "^3.2.0",
     "nodemailer": "^6.7.2",
-    "prompt-sync": "^4.2.0"
+    "pg": "^8.14.1",
+    "react": "latest",
+    "react-dom": "latest"
   },
   "devDependencies": {
-    "@types/prompt-sync": "^4.2.3",
-    "mocha": "^9.2.0",
-    "sinon": "^13.0.1"
+    "@types/node": "latest",
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "jest": "^29.0.0",
+    "prisma": "latest",
+    "typescript": "latest"
   }
 }
