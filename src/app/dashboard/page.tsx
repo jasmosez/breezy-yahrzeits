@@ -13,6 +13,10 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
 
+  const membersAndDeceased = forms.filter(form => form.member_status === 'Member' || form.member_status === 'Deceased');
+  const members = membersAndDeceased.filter(form => form.member_status === 'Member');
+
+
   useEffect(() => {
     // Generate month options when component mounts
     setMonthOptions(generateMonthOptions());
@@ -113,7 +117,7 @@ export default function DashboardPage() {
           <>
             <div style={{ marginBottom: '1rem' }}>
               <p>
-                Found <strong>{count}</strong> yahrzeits for the selected period.
+                Found <strong>{count}</strong> yahrzeits for the selected period: {selectedMonth}.
               </p>
             </div>
             
@@ -122,24 +126,24 @@ export default function DashboardPage() {
                 <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
                   <button 
                     className="button" 
-                    onClick={handleSendEmails}
-                    disabled={loading}
-                  >
-                    Send Emails
-                  </button>
-                  <button 
-                    className="button" 
                     onClick={handleDownloadCsv}
                     disabled={loading}
                   >
-                    Download CSV
+                      Download CSV ({count})
                   </button>
                   <button 
                     className="button" 
                     onClick={handleDownloadText}
                     disabled={loading}
                   >
-                    Download Text
+                    Download Text ({membersAndDeceased.length})
+                  </button>
+                  <button 
+                    className="button" 
+                    onClick={handleSendEmails}
+                    disabled={loading}
+                  >
+                    Send Emails ({members.length})
                   </button>
                 </div>
                 
@@ -148,6 +152,8 @@ export default function DashboardPage() {
                     <thead>
                       <tr>
                         <th style={{ textAlign: 'left', padding: '0.5rem', borderBottom: '1px solid var(--border-color)' }}>Mourner</th>
+                        <th style={{ textAlign: 'left', padding: '0.5rem', borderBottom: '1px solid var(--border-color)' }}>Status</th>
+                        <th style={{ textAlign: 'left', padding: '0.5rem', borderBottom: '1px solid var(--border-color)' }}>Beloved</th>
                         <th style={{ textAlign: 'left', padding: '0.5rem', borderBottom: '1px solid var(--border-color)' }}>Date of Passing</th>
                         <th style={{ textAlign: 'left', padding: '0.5rem', borderBottom: '1px solid var(--border-color)' }}>Hebrew Date</th>
                         <th style={{ textAlign: 'left', padding: '0.5rem', borderBottom: '1px solid var(--border-color)' }}>Calendar</th>
@@ -160,6 +166,12 @@ export default function DashboardPage() {
                         <tr key={form.id}>
                           <td style={{ padding: '0.5rem', borderBottom: '1px solid var(--border-color)' }}>
                             {form.profile_first_name} {form.profile_last_name}
+                          </td>
+                          <td style={{ padding: '0.5rem', borderBottom: '1px solid var(--border-color)' }}>
+                            {form.member_status}
+                          </td>
+                          <td style={{ padding: '0.5rem', borderBottom: '1px solid var(--border-color)' }}>
+                            {form.english_name_deceased}
                           </td>
                           <td style={{ padding: '0.5rem', borderBottom: '1px solid var(--border-color)' }}>
                             {form.greg_date_of_passing}{form.sunset_preposition}

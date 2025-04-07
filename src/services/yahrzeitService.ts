@@ -18,6 +18,7 @@ export interface YahrzeitForm {
   member_status?: string;
   month_number: number;
   year: number;
+  english_name_deceased: string;
 }
 
 const DAY_IN_MS = 24 * 60 * 60 * 1000;
@@ -160,7 +161,8 @@ export class YahrzeitService {
           next_yahrzeit_observed: nextYahrzeitObserved,
           next_yahrzeit_gregorian: nextYahrzeitGregorianDate.toLocaleDateString('en-US', localeOptions),
           month_number: nextYahrzeitGregorianDate.getMonth() + 1,
-          year: nextYahrzeitGregorianDate.getFullYear()
+          year: nextYahrzeitGregorianDate.getFullYear(),
+          english_name_deceased: form.response[this.formFieldMappings.englishNameDeceasedField]
         } as YahrzeitForm;
       } catch (error) {
         console.error('Error processing form:', error);
