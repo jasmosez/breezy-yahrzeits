@@ -43,3 +43,4 @@ yahrzeit*.csv
 yahrzeit*.txt
 shabbat_text.txt
 lib/email_templates/*
+scripts/create-real-org*
