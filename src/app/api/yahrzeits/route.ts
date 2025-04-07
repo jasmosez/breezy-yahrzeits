@@ -27,23 +27,29 @@ export async function GET(request: NextRequest) {
     const forms = await yahrzeitService.fetchYahrzeitForms();
     console.log(`Found ${forms.length} forms`)
 
-    const processedForms = yahrzeitService.processYahrzeitData(forms);
-    console.log(`Processed ${processedForms.length} forms`)
+    const processingResult = yahrzeitService.processYahrzeitData(forms);
+    console.log(`Processed ${processingResult.forms.length} forms`)
 
-    const filteredForms = yahrzeitService.filterByMonth(processedForms, month, year);
+    const filteredForms = yahrzeitService.filterByMonth(processingResult.forms, month, year);
     console.log(`Filtered ${filteredForms.length} forms`)
-
-    const formsWithProfileData = await yahrzeitService.addProfileData(filteredForms);
-    console.log(`Added profile data to ${formsWithProfileData.length} forms`)
- 
+    
+    // Add profile data
+    const profileResult = await yahrzeitService.addProfileData(filteredForms);
+    console.log(`Added profile data to ${profileResult.forms.length} forms`)
+    
+    
+    // Combine errors from both stages
+    const allErrors = [...processingResult.errors, ...profileResult.errors];
+    
     return NextResponse.json({
-      forms: formsWithProfileData,
-      count: formsWithProfileData.length,
+      forms: profileResult.forms,
+      count: profileResult.forms.length,
+      errors: allErrors
     });
   } catch (error) {
     console.error('Error fetching yahrzeits:', error);
     return NextResponse.json(
-      { error: 'Internal Server Error' },
+      { error: 'Failed to fetch yahrzeits' },
       { status: 500 }
     );
   }

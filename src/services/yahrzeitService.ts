@@ -21,6 +21,19 @@ export interface YahrzeitForm {
   english_name_deceased: string;
 }
 
+// Define an interface for processing results
+export interface YahrzeitProcessingResult {
+  forms: YahrzeitForm[];
+  errors: YahrzeitProcessingError[];
+}
+
+// Define an interface for processing errors
+export interface YahrzeitProcessingError {
+  formId: string;
+  error: string;
+  stage: 'processing' | 'profile';
+}
+
 const DAY_IN_MS = 24 * 60 * 60 * 1000;
 
 export class YahrzeitService {
@@ -92,14 +105,15 @@ export class YahrzeitService {
     return yahrzeitCurrentYear;
   }
 
-  processYahrzeitData(forms: any[]): YahrzeitForm[] {
+  processYahrzeitData(forms: any[]): YahrzeitProcessingResult {
     const localeOptions: Intl.DateTimeFormatOptions = { 
       year: 'numeric', 
       month: 'long', 
       day: 'numeric' 
     };
     
-    return forms.map(form => {
+    const errors: YahrzeitProcessingError[] = [];
+    const processedForms = forms.map(form => {
       try {
         // Get gregorian date of passing
         const dateOfPassing = this.dateFromStr(form.response[this.formFieldMappings.gregorianDateOfPassingField]);
@@ -166,9 +180,18 @@ export class YahrzeitService {
         } as YahrzeitForm;
       } catch (error) {
         console.error('Error processing form:', error);
+
+        // TODO: Add human identifiable data to the error info going to frontend
+        errors.push({
+          formId: form.id,
+          error: error instanceof Error ? error.message : String(error),
+          stage: 'processing'
+        });
         return null;
       }
     }).filter(Boolean) as YahrzeitForm[];
+
+    return { forms: processedForms, errors };
   }
 
   filterByMonth(forms: YahrzeitForm[], targetMonth: number | null, targetYear: number | null): YahrzeitForm[] {
@@ -181,10 +204,12 @@ export class YahrzeitService {
     );
   }
 
-  async addProfileData(forms: YahrzeitForm[]): Promise<YahrzeitForm[]> {
+  async addProfileData(forms: YahrzeitForm[]): Promise<YahrzeitProcessingResult> {
     if (!forms.length) {
-      return forms;
+      return { forms, errors: [] };
     }
+
+    const errors: YahrzeitProcessingError[] = [];
 
     // Get the person ID field from the form field mappings
     const personIdField = this.formFieldMappings.personIdField;
@@ -231,10 +256,21 @@ export class YahrzeitService {
           } as YahrzeitForm;
         } catch (error) {
           console.error(`Failed to get profile info for form ${form.id}:`, error);
+
+          // TODO: Add human identifiable data to the error info going to frontend
+          errors.push({
+            formId: form.id,
+            error: error instanceof Error ? error.message : String(error),
+            stage: 'profile'
+          });
+          return form; // Return the original form so it's not lost
         }
       })
-    )
+    );
 
-    return formsWithProfileData.filter(Boolean) as YahrzeitForm[];
+    return { 
+      forms: formsWithProfileData.filter(Boolean) as YahrzeitForm[], 
+      errors 
+    };
   }
 } 

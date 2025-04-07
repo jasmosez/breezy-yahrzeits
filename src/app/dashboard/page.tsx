@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Layout from '@/components/Layout';
 import YahrzeitTable from '@/components/YahrzeitTable';
 import { generateMonthOptions, parseMonthValue, MonthOption } from '@/lib/dateUtils';
-import { YahrzeitForm } from '@/services/yahrzeitService';
+import { YahrzeitForm, YahrzeitProcessingError } from '@/services/yahrzeitService';
 
 export default function DashboardPage() {
   const [monthOptions, setMonthOptions] = useState<MonthOption[]>([]);
@@ -13,6 +13,7 @@ export default function DashboardPage() {
   const [count, setCount] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
+  const [processingErrors, setProcessingErrors] = useState<YahrzeitProcessingError[]>([]);
 
   const membersAndDeceased = forms.filter(form => form.member_status === 'Member' || form.member_status === 'Deceased');
   const members = membersAndDeceased.filter(form => form.member_status === 'Member');
@@ -38,7 +39,12 @@ export default function DashboardPage() {
 
   const fetchYahrzeits = async () => {
     setLoading(true);
+    
+    // Reset data state variables at the beginning
     setError('');
+    setProcessingErrors([]);
+    setForms([]);
+    setCount(0);
     
     try {
       const { month, year } = parseMonthValue(selectedMonth);
@@ -56,6 +62,7 @@ export default function DashboardPage() {
       const data = await response.json();
       setForms(data.forms);
       setCount(data.count);
+      setProcessingErrors(data.errors || []);
     } catch (err) {
       setError('Error fetching yahrzeit data');
       console.error(err);
@@ -82,6 +89,15 @@ export default function DashboardPage() {
     console.log('Send emails');
     // TODO: Implement email sending
   };
+
+  // Group errors by stage
+  const processingErrorsByStage = processingErrors.reduce((acc, error) => {
+    if (!acc[error.stage]) {
+      acc[error.stage] = [];
+    }
+    acc[error.stage].push(error);
+    return acc;
+  }, {} as Record<string, YahrzeitProcessingError[]>);
 
   return (
     <Layout>
@@ -112,6 +128,28 @@ export default function DashboardPage() {
         {error && (
           <div className="error-message">
             {error}
+          </div>
+        )}
+        
+        {processingErrors.length > 0 && (
+          <div className="error-message" style={{ marginBottom: '1rem' }}>
+            <h3 style={{ marginBottom: '0.5rem' }}>Processing Errors</h3>
+            <p>Some yahrzeit forms could not be processed correctly:</p>
+            
+            {Object.entries(processingErrorsByStage).map(([stage, errors]) => (
+              <div key={stage} style={{ marginTop: '0.5rem' }}>
+                <h4 style={{ marginBottom: '0.25rem' }}>
+                  {stage === 'processing' ? 'Data Processing Errors' : 'Profile Data Errors'}
+                </h4>
+                <ul style={{ marginLeft: '1.5rem' }}>
+                  {errors.map((error, index) => (
+                    <li key={index}>
+                      Form ID: {error.formId} - {error.error}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
           </div>
         )}
         
