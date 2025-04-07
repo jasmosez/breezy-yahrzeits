@@ -117,7 +117,7 @@ export default function DashboardPage() {
           <>
             <div style={{ marginBottom: '1rem' }}>
               <p>
-                Found <strong>{count}</strong> yahrzeits for the selected period: {selectedMonth}.
+                Found <strong>{count}</strong> yahrzeits for the selected period.
               </p>
             </div>
             
@@ -136,7 +136,7 @@ export default function DashboardPage() {
                     onClick={handleDownloadText}
                     disabled={loading}
                   >
-                    Download Text ({membersAndDeceased.length})
+                    Download Shabbat Text ({membersAndDeceased.length})
                   </button>
                   <button 
                     className="button" 
@@ -147,7 +147,7 @@ export default function DashboardPage() {
                   </button>
                 </div>
                 
-                <div style={{ overflowX: 'auto' }}>
+                <div style={{ overflowX: 'auto', fontSize: '0.75rem' }}>
                   <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                     <thead>
                       <tr>
@@ -162,34 +162,42 @@ export default function DashboardPage() {
                       </tr>
                     </thead>
                     <tbody>
-                      {forms.map(form => (
-                        <tr key={form.id}>
-                          <td style={{ padding: '0.5rem', borderBottom: '1px solid var(--border-color)' }}>
-                            {form.profile_first_name} {form.profile_last_name}
-                          </td>
-                          <td style={{ padding: '0.5rem', borderBottom: '1px solid var(--border-color)' }}>
-                            {form.member_status}
-                          </td>
-                          <td style={{ padding: '0.5rem', borderBottom: '1px solid var(--border-color)' }}>
-                            {form.english_name_deceased}
-                          </td>
-                          <td style={{ padding: '0.5rem', borderBottom: '1px solid var(--border-color)' }}>
-                            {form.greg_date_of_passing}{form.sunset_preposition}
-                          </td>
-                          <td style={{ padding: '0.5rem', borderBottom: '1px solid var(--border-color)' }}>
-                            {form.hebrew_date_of_passing}
-                          </td>
-                          <td style={{ padding: '0.5rem', borderBottom: '1px solid var(--border-color)' }}>
-                            {form.calendar}
-                          </td>
-                          <td style={{ padding: '0.5rem', borderBottom: '1px solid var(--border-color)' }}>
-                            {form.next_yahrzeit_observed}
-                          </td>
-                          <td style={{ padding: '0.5rem', borderBottom: '1px solid var(--border-color)' }}>
-                            {form.next_yahrzeit_gregorian}
-                          </td>
-                        </tr>
-                      ))}
+                      {forms.map(form => {
+                        // Determine text color based on member status
+                        const textColor = form.member_status !== 'Member' ? 'var(--text-very-light)' : 'inherit';
+
+                        // Apply italics to any status other than 'Member' or 'Deceased'
+                        const fontStyle = form.member_status !== 'Member' && form.member_status !== 'Deceased' ? 'italic' : 'normal';
+                        
+                        return (
+                          <tr key={form.id} style={{ color: textColor, fontStyle }}>
+                            <td style={{ padding: '0.5rem', borderBottom: '1px solid var(--border-color)' }}>
+                              {form.profile_first_name} {form.profile_last_name}
+                            </td>
+                            <td style={{ padding: '0.5rem', borderBottom: '1px solid var(--border-color)' }}>
+                              {form.member_status}
+                            </td>
+                            <td style={{ padding: '0.5rem', borderBottom: '1px solid var(--border-color)' }}>
+                              {form.english_name_deceased}
+                            </td>
+                            <td style={{ padding: '0.5rem', borderBottom: '1px solid var(--border-color)' }}>
+                              {form.greg_date_of_passing}{form.sunset_preposition}
+                            </td>
+                            <td style={{ padding: '0.5rem', borderBottom: '1px solid var(--border-color)' }}>
+                              {form.hebrew_date_of_passing}
+                            </td>
+                            <td style={{ padding: '0.5rem', borderBottom: '1px solid var(--border-color)' }}>
+                              {form.calendar}
+                            </td>
+                            <td style={{ padding: '0.5rem', borderBottom: '1px solid var(--border-color)' }}>
+                              {form.next_yahrzeit_observed}
+                            </td>
+                            <td style={{ padding: '0.5rem', borderBottom: '1px solid var(--border-color)' }}>
+                              {form.next_yahrzeit_gregorian}
+                            </td>
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </table>
                 </div>
