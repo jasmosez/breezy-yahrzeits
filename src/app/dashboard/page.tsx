@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Layout from '@/components/Layout';
+import YahrzeitTable from '@/components/YahrzeitTable';
 import { generateMonthOptions, parseMonthValue, MonthOption } from '@/lib/dateUtils';
 import { YahrzeitForm } from '@/services/yahrzeitService';
 
@@ -68,14 +69,17 @@ export default function DashboardPage() {
   };
 
   const handleDownloadCsv = () => {
+    console.log('Download CSV');
     // TODO: Implement CSV download
   };
 
   const handleDownloadText = () => {
+    console.log('Download text file');
     // TODO: Implement text file download
   };
 
   const handleSendEmails = () => {
+    console.log('Send emails');
     // TODO: Implement email sending
   };
 
@@ -147,60 +151,7 @@ export default function DashboardPage() {
                   </button>
                 </div>
                 
-                <div style={{ overflowX: 'auto', fontSize: '0.75rem' }}>
-                  <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                    <thead>
-                      <tr>
-                        <th style={{ textAlign: 'left', padding: '0.5rem', borderBottom: '1px solid var(--border-color)' }}>Mourner</th>
-                        <th style={{ textAlign: 'left', padding: '0.5rem', borderBottom: '1px solid var(--border-color)' }}>Status</th>
-                        <th style={{ textAlign: 'left', padding: '0.5rem', borderBottom: '1px solid var(--border-color)' }}>Beloved</th>
-                        <th style={{ textAlign: 'left', padding: '0.5rem', borderBottom: '1px solid var(--border-color)' }}>Date of Passing</th>
-                        <th style={{ textAlign: 'left', padding: '0.5rem', borderBottom: '1px solid var(--border-color)' }}>Hebrew Date</th>
-                        <th style={{ textAlign: 'left', padding: '0.5rem', borderBottom: '1px solid var(--border-color)' }}>Calendar</th>
-                        <th style={{ textAlign: 'left', padding: '0.5rem', borderBottom: '1px solid var(--border-color)' }}>Next Yahrzeit</th>
-                        <th style={{ textAlign: 'left', padding: '0.5rem', borderBottom: '1px solid var(--border-color)' }}>Gregorian</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {forms.map(form => {
-                        // Determine text color based on member status
-                        const textColor = form.member_status !== 'Member' ? 'var(--text-very-light)' : 'inherit';
-
-                        // Apply italics to any status other than 'Member' or 'Deceased'
-                        const fontStyle = form.member_status !== 'Member' && form.member_status !== 'Deceased' ? 'italic' : 'normal';
-                        
-                        return (
-                          <tr key={form.id} style={{ color: textColor, fontStyle }}>
-                            <td style={{ padding: '0.5rem', borderBottom: '1px solid var(--border-color)' }}>
-                              {form.profile_first_name} {form.profile_last_name}
-                            </td>
-                            <td style={{ padding: '0.5rem', borderBottom: '1px solid var(--border-color)' }}>
-                              {form.member_status}
-                            </td>
-                            <td style={{ padding: '0.5rem', borderBottom: '1px solid var(--border-color)' }}>
-                              {form.english_name_deceased}
-                            </td>
-                            <td style={{ padding: '0.5rem', borderBottom: '1px solid var(--border-color)' }}>
-                              {form.greg_date_of_passing}{form.sunset_preposition}
-                            </td>
-                            <td style={{ padding: '0.5rem', borderBottom: '1px solid var(--border-color)' }}>
-                              {form.hebrew_date_of_passing}
-                            </td>
-                            <td style={{ padding: '0.5rem', borderBottom: '1px solid var(--border-color)' }}>
-                              {form.calendar}
-                            </td>
-                            <td style={{ padding: '0.5rem', borderBottom: '1px solid var(--border-color)' }}>
-                              {form.next_yahrzeit_observed}
-                            </td>
-                            <td style={{ padding: '0.5rem', borderBottom: '1px solid var(--border-color)' }}>
-                              {form.next_yahrzeit_gregorian}
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
+                <YahrzeitTable forms={forms} />
               </div>
             )}
           </>
