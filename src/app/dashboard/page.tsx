@@ -137,12 +137,12 @@ export default function DashboardPage() {
             {Object.entries(processingErrorsByStage).map(([stage, errors]) => (
               <div key={stage} style={{ marginTop: '0.5rem' }}>
                 <h4 style={{ marginBottom: '0.25rem' }}>
-                  {stage === 'processing' ? 'Data Processing Errors' : 'Profile Data Errors'}
+                  {stage === 'processing' ? 'Data Processing Errors' : 'Profile Data Errors'} ({errors.length})
                 </h4>
                 <ul style={{ marginLeft: '1.5rem' }}>
                   {errors.map((error, index) => (
                     <li key={index}>
-                      Form ID: {error.formId} - {error.error}
+                      Form ID: {error.formId} ({error.deceasedName} deceased) - {error.error}
                     </li>
                   ))}
                 </ul>

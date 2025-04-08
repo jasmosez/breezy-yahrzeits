@@ -30,6 +30,7 @@ export interface YahrzeitProcessingResult {
 // Define an interface for processing errors
 export interface YahrzeitProcessingError {
   formId: string;
+  deceasedName: string;
   error: string;
   stage: 'processing' | 'profile';
 }
@@ -179,11 +180,10 @@ export class YahrzeitService {
           english_name_deceased: form.response[this.formFieldMappings.englishNameDeceasedField]
         } as YahrzeitForm;
       } catch (error) {
-        console.error('Error processing form:', error);
-
-        // TODO: Add human identifiable data to the error info going to frontend
+        console.error(`Error processing form ${form.id}:`, error);
         errors.push({
           formId: form.id,
+          deceasedName: form.english_name_deceased,
           error: error instanceof Error ? error.message : String(error),
           stage: 'processing'
         });
@@ -256,14 +256,13 @@ export class YahrzeitService {
           } as YahrzeitForm;
         } catch (error) {
           console.error(`Failed to get profile info for form ${form.id}:`, error);
-
-          // TODO: Add human identifiable data to the error info going to frontend
           errors.push({
             formId: form.id,
+            deceasedName: form.english_name_deceased,
             error: error instanceof Error ? error.message : String(error),
             stage: 'profile'
           });
-          return form; // Return the original form so it's not lost
+          return null;
         }
       })
     );
