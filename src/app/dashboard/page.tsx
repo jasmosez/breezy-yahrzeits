@@ -3,12 +3,12 @@
 import { useState, useEffect } from 'react';
 import Layout from '@/components/Layout';
 import YahrzeitTable from '@/components/YahrzeitTable';
-import { generateMonthOptions, parseMonthValue, MonthOption } from '@/lib/dateUtils';
+import { generateMonthOptions, parseMonthValue, MonthOption, PLACEHOLDER_OPTION } from '@/lib/dateUtils';
 import { YahrzeitForm, YahrzeitProcessingError } from '@/services/yahrzeitService';
 
 export default function DashboardPage() {
   const [monthOptions, setMonthOptions] = useState<MonthOption[]>([]);
-  const [selectedMonth, setSelectedMonth] = useState<string>('');
+  const [selectedMonth, setSelectedMonth] = useState<string>(PLACEHOLDER_OPTION.value);
   const [forms, setForms] = useState<YahrzeitForm[]>([]);
   const [count, setCount] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false);
@@ -22,24 +22,18 @@ export default function DashboardPage() {
   useEffect(() => {
     // Generate month options when component mounts
     setMonthOptions(generateMonthOptions());
-    
-    // Set default selection to next month
-    if (monthOptions.length > 0) {
-      console.log(monthOptions);
-      setSelectedMonth(monthOptions[1].value);
-    }
   }, []);
 
   useEffect(() => {
     // Fetch data when selected month changes
-    if (selectedMonth) {
+    if (selectedMonth && selectedMonth !== PLACEHOLDER_OPTION.value) {
       fetchYahrzeits();
     }
   }, [selectedMonth]);
 
   const fetchYahrzeits = async () => {
     setLoading(true);
-    
+
     // Reset data state variables at the beginning
     setError('');
     setProcessingErrors([]);
@@ -118,7 +112,11 @@ export default function DashboardPage() {
             disabled={loading}
           >
             {monthOptions.map(option => (
-              <option key={option.value} value={option.value}>
+              <option 
+                key={option.value} 
+                value={option.value}
+                disabled={option.value === PLACEHOLDER_OPTION.value}
+              >
                 {option.label}
               </option>
             ))}

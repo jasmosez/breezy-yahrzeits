@@ -3,8 +3,17 @@ export interface MonthOption {
   label: string;
 }
 
+export const PLACEHOLDER_OPTION = {
+  value: 'placeholder',
+  label: '-- Select Month --'
+};
+
 export function generateMonthOptions(): MonthOption[] {
   const options: MonthOption[] = [];
+  
+  // Add placeholder option
+  options.push(PLACEHOLDER_OPTION);
+  
   const today = new Date();
   const currentYear = today.getFullYear();
   const currentMonth = today.getMonth();
