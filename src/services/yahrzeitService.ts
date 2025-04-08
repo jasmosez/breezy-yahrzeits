@@ -273,4 +273,8 @@ export class YahrzeitService {
       errors 
     };
   }
+
+  compareNextYahrzeitGregorian(a: YahrzeitForm, b: YahrzeitForm): number {
+    return new Date(a.next_yahrzeit_gregorian).getTime() - new Date(b.next_yahrzeit_gregorian).getTime();
+  }
 } 
