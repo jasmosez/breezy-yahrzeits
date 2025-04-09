@@ -66,14 +66,9 @@ export const groupByWeek = (forms: YahrzeitForm[]): Record<string, YahrzeitForm[
  * @returns Promise that resolves when the text file is downloaded
  */
 export const generateTextFromForms = (forms: YahrzeitForm[]): void => {
-  try {
-    // Filter forms to only include members and deceased
-    const filteredForms = forms.filter(form => 
-      form.member_status === 'Member' || form.member_status === 'Deceased'
-    );
-    
+  try {    
     // Sort forms by yahrzeit date, just in case
-    const sortedForms = [...filteredForms].sort(YahrzeitService.compareNextYahrzeitGregorian);
+    const sortedForms = [...forms].sort(YahrzeitService.compareNextYahrzeitGregorian);
     
     // Generate text content
     let textContent = '';

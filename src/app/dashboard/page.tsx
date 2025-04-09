@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Layout from '@/components/Layout';
 import YahrzeitTable from '@/components/YahrzeitTable';
 import { generateMonthOptions, parseMonthValue, MonthOption, PLACEHOLDER_OPTION } from '@/lib/dateUtils';
-import { YahrzeitForm, YahrzeitProcessingError } from '@/services/yahrzeitService';
+import { YahrzeitForm, YahrzeitProcessingError, MEMBER_STATUS } from '@/services/yahrzeitService';
 import { generateCsvFromForms, generateTextFromForms } from '@/lib/exportUtils';
 
 export default function DashboardPage() {
@@ -16,8 +16,8 @@ export default function DashboardPage() {
   const [error, setError] = useState<string>('');
   const [processingErrors, setProcessingErrors] = useState<YahrzeitProcessingError[]>([]);
 
-  const membersAndDeceased = forms.filter(form => form.member_status === 'Member' || form.member_status === 'Deceased');
-  const members = membersAndDeceased.filter(form => form.member_status === 'Member');
+  const membersAndDeceased = forms.filter(form => form.member_status === MEMBER_STATUS.MEMBER || form.member_status === MEMBER_STATUS.DECEASED);
+  const members = membersAndDeceased.filter(form => form.member_status === MEMBER_STATUS.MEMBER);
 
 
   useEffect(() => {
@@ -72,6 +72,7 @@ export default function DashboardPage() {
 
   const handleExportCsv = async () => {
     try {
+      // CSV includes all forms
       await generateCsvFromForms(forms);
     } catch (error) {
       console.error('Error exporting CSV:', error);
@@ -81,7 +82,8 @@ export default function DashboardPage() {
 
   const handleExportText = () => {
     try {
-      generateTextFromForms(forms);
+      // Text includes only members and deceased
+      generateTextFromForms(membersAndDeceased);
     } catch (error) {
       console.error('Error exporting text:', error);
       setError('Failed to generate text file');
@@ -90,7 +92,7 @@ export default function DashboardPage() {
 
   const handleSendEmails = () => {
     console.log('Send emails');
-    // TODO: Implement email sending
+    // TODO: Send emails to members
   };
 
   // Group errors by stage

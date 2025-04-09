@@ -38,6 +38,11 @@ export interface YahrzeitProcessingError {
 
 const DAY_IN_MS = 24 * 60 * 60 * 1000;
 
+export const MEMBER_STATUS = {
+  MEMBER: 'Member',
+  DECEASED: 'Deceased',
+}
+
 export class YahrzeitService {
   private formFieldMappings: any;
   private organizationId: string;
