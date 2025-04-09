@@ -21,10 +21,19 @@ model Organization {
   breezeApiKey    String
   breezeFormId    String
   
-  // Email Configuration
-  emailTemplate   String   @db.Text
+  // Email Config and Templates
   emailFrom       String   
   emailBcc        String?
+  subjectTemplate String?  @db.Text
+  textTemplate    String?  @db.Text
+  htmlTemplate    String?  @db.Text
+  
+  // SMTP Configuration
+  smtpHost        String?
+  smtpPort        Int?
+  smtpUsername    String?
+  smtpPassword    String?
+  smtpSecure      Boolean  @default(false)
   
   // Form field mappings
   formFieldMappings Json

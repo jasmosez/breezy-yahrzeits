@@ -90,9 +90,50 @@ export default function DashboardPage() {
     }
   };
 
-  const handleSendEmails = () => {
-    console.log('Send emails');
-    // TODO: Send emails to members
+  const handleSendEmails = async () => {
+    try {
+      
+      if (members.length === 0) {
+        alert('No eligible members found for email notifications.');
+        return;
+      }
+      
+      // Show confirmation dialog
+      const confirmed = window.confirm(
+        `Are you sure you want to send email notifications to ${members.length} members?`
+      );
+      
+      if (!confirmed) {
+        return;
+      }
+      
+      // Call the email API endpoint
+      const response = await fetch('/api/email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ forms: members }),
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to send emails');
+      }
+      
+      const result = await response.json();
+      
+      // Show success message
+      alert(`Successfully sent ${result.successfulEmails.length} emails. ${result.failedEmails.length} failed.`);
+      
+      // Log any failures for debugging
+      if (result.failedEmails.length > 0) {
+        console.error('Failed to send emails to:', result.failedEmails);
+      }
+    } catch (error) {
+      console.error('Error sending emails:', error);
+      alert('An error occurred while sending emails. Please try again later.');
+    }
   };
 
   // Group errors by stage
