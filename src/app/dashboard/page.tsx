@@ -5,7 +5,7 @@ import Layout from '@/components/Layout';
 import YahrzeitTable from '@/components/YahrzeitTable';
 import { generateMonthOptions, parseMonthValue, MonthOption, PLACEHOLDER_OPTION } from '@/lib/dateUtils';
 import { YahrzeitForm, YahrzeitProcessingError } from '@/services/yahrzeitService';
-import { generateCsvFromForms, generateTextFromForms } from '@/lib/yahrzeitUtils';
+import { generateCsvFromForms, generateTextFromForms } from '@/lib/exportUtils';
 
 export default function DashboardPage() {
   const [monthOptions, setMonthOptions] = useState<MonthOption[]>([]);
