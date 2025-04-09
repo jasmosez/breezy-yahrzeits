@@ -5,6 +5,7 @@ import Layout from '@/components/Layout';
 import YahrzeitTable from '@/components/YahrzeitTable';
 import { generateMonthOptions, parseMonthValue, MonthOption, PLACEHOLDER_OPTION } from '@/lib/dateUtils';
 import { YahrzeitForm, YahrzeitProcessingError } from '@/services/yahrzeitService';
+import { generateCsvFromForms, generateTextFromForms } from '@/lib/yahrzeitUtils';
 
 export default function DashboardPage() {
   const [monthOptions, setMonthOptions] = useState<MonthOption[]>([]);
@@ -69,14 +70,22 @@ export default function DashboardPage() {
     setSelectedMonth(e.target.value);
   };
 
-  const handleDownloadCsv = () => {
-    console.log('Download CSV');
-    // TODO: Implement CSV download
+  const handleExportCsv = async () => {
+    try {
+      await generateCsvFromForms(forms);
+    } catch (error) {
+      console.error('Error exporting CSV:', error);
+      setError('Failed to generate CSV file');
+    }
   };
 
-  const handleDownloadText = () => {
-    console.log('Download text file');
-    // TODO: Implement text file download
+  const handleExportText = () => {
+    try {
+      generateTextFromForms(forms);
+    } catch (error) {
+      console.error('Error exporting text:', error);
+      setError('Failed to generate text file');
+    }
   };
 
   const handleSendEmails = () => {
@@ -166,22 +175,22 @@ export default function DashboardPage() {
                 <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
                   <button 
                     className="button" 
-                    onClick={handleDownloadCsv}
+                    onClick={handleExportCsv}
                     disabled={loading}
                   >
-                      Download CSV ({count})
+                    Download CSV ({count})
                   </button>
                   <button 
                     className="button" 
-                    onClick={handleDownloadText}
-                    disabled={loading}
+                    onClick={handleExportText}
+                    disabled={loading || selectedMonth === 'all'}
                   >
                     Download Shabbat Text ({membersAndDeceased.length})
                   </button>
                   <button 
                     className="button" 
                     onClick={handleSendEmails}
-                    disabled={loading}
+                    disabled={loading || selectedMonth === 'all'}
                   >
                     Send Emails ({members.length})
                   </button>

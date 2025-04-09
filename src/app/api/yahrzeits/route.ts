@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
     const allErrors = [...processingResult.errors, ...profileResult.errors];
     
     return NextResponse.json({
-      forms: profileResult.forms.sort(yahrzeitService.compareNextYahrzeitGregorian),
+      forms: profileResult.forms.sort(YahrzeitService.compareNextYahrzeitGregorian),
       count: profileResult.forms.length,
       errors: allErrors
     });

@@ -19,6 +19,7 @@ export interface YahrzeitForm {
   month_number: number;
   year: number;
   english_name_deceased: string;
+  relationship: string;
 }
 
 // Define an interface for processing results
@@ -177,7 +178,8 @@ export class YahrzeitService {
           next_yahrzeit_gregorian: nextYahrzeitGregorianDate.toLocaleDateString('en-US', localeOptions),
           month_number: nextYahrzeitGregorianDate.getMonth() + 1,
           year: nextYahrzeitGregorianDate.getFullYear(),
-          english_name_deceased: form.response[this.formFieldMappings.englishNameDeceasedField]
+          english_name_deceased: form.response[this.formFieldMappings.englishNameDeceasedField],
+          relationship: form.response[this.formFieldMappings.relationshipField]
         } as YahrzeitForm;
       } catch (error) {
         console.error(`Error processing form ${form.id}:`, error);
@@ -273,7 +275,7 @@ export class YahrzeitService {
     };
   }
 
-  compareNextYahrzeitGregorian(a: YahrzeitForm, b: YahrzeitForm): number {
+  static compareNextYahrzeitGregorian(a: YahrzeitForm, b: YahrzeitForm): number {
     return new Date(a.next_yahrzeit_gregorian).getTime() - new Date(b.next_yahrzeit_gregorian).getTime();
   }
 } 
