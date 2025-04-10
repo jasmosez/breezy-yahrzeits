@@ -1,9 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { YahrzeitForm } from '@/services/yahrzeitService';
-import { emailService } from '@/lib/emailService';
+import { emailServiceRegistry } from '@/lib/emailServiceRegistry';
+import { getCurrentOrganization } from '@/lib/auth';
 
 export async function POST(request: NextRequest) {
   try {
+    const organization = await getCurrentOrganization();
+
+    if (!organization) {
+      return NextResponse.json(
+        { error: 'No organization found' },
+        { status: 400 }
+      );
+    }
+
+    const emailService = await emailServiceRegistry.getServiceForOrganization(organization.id);
     const { forms } = await request.json();
     
     if (!forms || !Array.isArray(forms) || forms.length === 0) {

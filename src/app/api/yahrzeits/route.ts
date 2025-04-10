@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getCurrentOrganization } from '@/lib/auth';
 import { YahrzeitService } from '@/services/yahrzeitService';
-
+import { emailServiceRegistry } from '@/lib/emailServiceRegistry';
 export async function GET(request: NextRequest) {
   try {
     // Get the current organization
@@ -44,7 +44,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       forms: profileResult.forms.sort(YahrzeitService.compareNextYahrzeitGregorian),
       count: profileResult.forms.length,
-      errors: allErrors
+      errors: allErrors,
+      smtpStatus: await emailServiceRegistry.getSmtpStatus(organization.id)
     });
   } catch (error) {
     console.error('Error fetching yahrzeits:', error);

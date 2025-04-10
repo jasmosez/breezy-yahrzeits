@@ -77,41 +77,23 @@ export class EmailService {
   private transporter: nodemailer.Transporter | null = null;
   private isDevelopmentMode: boolean = process.env.NODE_ENV !== 'production';
   private isInitialized: boolean = false;
+  private organizationId: string | null = null;
+  private isTestMode: boolean = false;
+  private smtpHost?: string;
 
   constructor() {
     // Don't initialize in constructor - do it lazily when needed
   }
 
   // Initialize the transporter
-  private async initEmailService() {
+  public async initEmailService(organizationId: string) {
     if (this.isInitialized) return;
+
+    this.organizationId = organizationId;
     
-    let emailConfig: any;
-    try {
-      // In development, use a test SMTP server
-      if (this.isDevelopmentMode) {
-        console.log('Development mode: Using Ethereal Mail for testing');
-        
-        // Create a test account on Ethereal
-        const testAccount = await nodemailer.createTestAccount();
-        
-        emailConfig = {
-          host: 'smtp.ethereal.email',
-          port: 587,
-          secure: false,
-          auth: {
-            user: testAccount.user,
-            pass: testAccount.pass,
-          },
-        };
-      } else {
-        // In production, use the organization's SMTP settings
-        emailConfig = await this.getSmtpSettings();
-      }
-      
+    try {  
+      const emailConfig = await this.getSmtpSettings();
       this.transporter = nodemailer.createTransport(emailConfig);
-      
-      // Verify connection configuration
       await this.transporter.verify();
       console.log('Email service initialized successfully');
       this.isInitialized = true;
@@ -123,7 +105,6 @@ export class EmailService {
 
   // Get email templates from database or use defaults
   private async getEmailTemplates() {
-    // TODO: handle no templates as an organization setting
     try {
       const organization = await getCurrentOrganization();
       if (!organization) {
@@ -132,8 +113,12 @@ export class EmailService {
 
       // Check if organization has templates
       if (!organization.subjectTemplate && !organization.textTemplate && !organization.htmlTemplate) {
-        console.warn('No email templates found in organization, using defaults');
-        return defaultTemplates;
+        if (this.isDevelopmentMode) {
+          console.warn('No email templates found in organization. Development mode: Using default templates');
+          return defaultTemplates;
+        } else {
+          throw new Error('No email templates found in organization');
+        }
       }
 
       // Use organization templates or fall back to defaults
@@ -164,9 +149,37 @@ export class EmailService {
     return result;
   }
 
+  private async useTestSmtp() {
+    this.isTestMode = true;
+    this.smtpHost = 'smtp.ethereal.email';
+
+    const testAccount = await nodemailer.createTestAccount();
+    return {
+        host: 'smtp.ethereal.email',
+        port: 587,
+        secure: false,
+        auth: {
+          user: testAccount.user,
+          pass: testAccount.pass,
+        },
+      }
+  }
+
+ public getSmtpStatus() {
+    return {
+      isTestMode: this.isTestMode,
+      smtpHost: this.smtpHost,
+    }
+  }
+
   // Get SMTP settings from database
   private async getSmtpSettings() {
     try {
+      if (this.isDevelopmentMode) {
+        console.log('Development mode: Using Ethereal Mail for testing');
+        return await this.useTestSmtp();
+      }
+
       const organization = await getCurrentOrganization();
       if (!organization) {
         throw new Error('No organization found');
@@ -177,19 +190,17 @@ export class EmailService {
         throw new Error('Incomplete SMTP settings for organization');
       }
 
+      this.smtpHost = organization.smtpHost;
+      this.isTestMode = false;
       return {
-        from: organization.emailFrom || 'noreply@example.com',
-        bcc: organization.emailBcc || '',
-        smtp: {
           host: organization.smtpHost,
           port: organization.smtpPort,
           secure: organization.smtpSecure || false,
           auth: {
             user: organization.smtpUsername,
             pass: organization.smtpPassword,
-          },
-        }
-      };
+          }
+      }
     } catch (error) {
       console.error('Error fetching SMTP settings:', error);
       throw error;
@@ -261,10 +272,6 @@ export class EmailService {
 
   // Send emails to multiple recipients
   public async sendEmails(forms: YahrzeitForm[]) {
-    // Initialize the service if needed
-    if (!this.isInitialized) {
-      await this.initEmailService();
-    }
     
     const results = [];
     
@@ -295,6 +302,3 @@ export class EmailService {
     return results;
   }
 }
-
-// Export a singleton instance
-export const emailService = new EmailService(); 

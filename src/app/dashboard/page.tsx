@@ -6,6 +6,7 @@ import YahrzeitTable from '@/components/YahrzeitTable';
 import { generateMonthOptions, parseMonthValue, MonthOption, PLACEHOLDER_OPTION } from '@/lib/dateUtils';
 import { YahrzeitForm, YahrzeitProcessingError, MEMBER_STATUS } from '@/services/yahrzeitService';
 import { generateCsvFromForms, generateTextFromForms } from '@/lib/exportUtils';
+import { SmtpStatus } from '@/lib/emailServiceRegistry';
 
 export default function DashboardPage() {
   const [monthOptions, setMonthOptions] = useState<MonthOption[]>([]);
@@ -15,6 +16,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
   const [processingErrors, setProcessingErrors] = useState<YahrzeitProcessingError[]>([]);
+  const [smtpStatus, setSmtpStatus] = useState<SmtpStatus | null>(null);
 
   const membersAndDeceased = forms.filter(form => form.member_status === MEMBER_STATUS.MEMBER || form.member_status === MEMBER_STATUS.DECEASED);
   const members = membersAndDeceased.filter(form => form.member_status === MEMBER_STATUS.MEMBER);
@@ -58,6 +60,7 @@ export default function DashboardPage() {
       setForms(data.forms);
       setCount(data.count);
       setProcessingErrors(data.errors || []);
+      setSmtpStatus(data.smtpStatus);
     } catch (err) {
       setError('Error fetching yahrzeit data');
       console.error(err);
@@ -100,7 +103,7 @@ export default function DashboardPage() {
       
       // Show confirmation dialog
       const confirmed = window.confirm(
-        `Are you sure you want to send email notifications to ${members.length} members?`
+        `Are you sure you want to send email notifications to ${members.length} members using ${smtpStatus?.smtpHost}?`
       );
       
       if (!confirmed) {
@@ -235,7 +238,7 @@ export default function DashboardPage() {
                     onClick={handleSendEmails}
                     disabled={loading || selectedMonth === 'all'}
                   >
-                    Send Emails ({members.length})
+                    {smtpStatus?.isTestMode ? 'Send Test Emails' : 'Send Emails'} ({members.length})
                   </button>
                 </div>
                 
