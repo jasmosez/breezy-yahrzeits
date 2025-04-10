@@ -1,3 +1,49 @@
+# Breezy Yahrzeits
+
+A web application for managing and tracking yahrzeits (Jewish memorial anniversaries).
+
+## Features
+
+- Track yahrzeits for members
+- Send email reminders for upcoming yahrzeits
+- Export yahrzeit data in various formats
+- Manage organization settings
+
+## Development
+
+```bash
+# Install dependencies
+npm install
+
+# Run development server
+npm run dev
+
+# Build for production
+npm run build
+
+# Start production server
+npm start
+```
+
+## Deployment
+
+This project is deployed on Netlify with GitHub-triggered CI/CD.
+
+## Environment Variables
+
+Create a `.env.local` file with the following variables:
+
+```
+DATABASE_URL=your_database_url
+NEXTAUTH_URL=http://localhost:3000
+NEXTAUTH_SECRET=your_nextauth_secret
+```
+
+For production, set these variables in your Netlify dashboard.
+
+---
+
+# Former CLI README
 # breezy-yahrzeits
 Utilities for delivering Yahrzeit functionality for Breeze users
 

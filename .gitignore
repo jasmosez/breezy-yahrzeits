@@ -1,5 +1,5 @@
 # dependencies
-node_modules/
+/node_modules
 /.pnp
 .pnp.js
 
@@ -23,8 +23,8 @@ yarn-debug.log*
 yarn-error.log*
 
 # local env files
-.env
 .env*.local
+.env
 
 # vercel
 .vercel
@@ -32,6 +32,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Netlify
+.netlify
 
 # Prisma
 /prisma/*.db
