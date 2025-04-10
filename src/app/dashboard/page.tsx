@@ -32,6 +32,7 @@ export default function DashboardPage() {
     if (selectedMonth && selectedMonth !== PLACEHOLDER_OPTION.value) {
       fetchYahrzeits();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedMonth]);
 
   const fetchYahrzeits = async () => {

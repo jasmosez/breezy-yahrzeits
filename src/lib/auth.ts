@@ -26,6 +26,7 @@ export async function verifyToken(token: string): Promise<{ organizationId: stri
     const verified = await jwtVerify(token, new TextEncoder().encode(JWT_SECRET));
     return verified.payload as { organizationId: string };
   } catch (error) {
+    console.error('Error verifying token:', error);
     return null;
   }
 }
@@ -44,7 +45,7 @@ export async function getCurrentOrganization() {
   });
 }
 
-export async function requireAuth(request: NextRequest) {
+export async function requireAuth(_request: NextRequest) {
   const cookieStore = await cookies();
   const token = cookieStore.get('auth_token')?.value;
   

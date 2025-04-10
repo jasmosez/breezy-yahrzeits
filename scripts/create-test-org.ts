@@ -15,8 +15,17 @@ async function main() {
         breezeSubdomain: 'testorg',
         breezeApiKey: 'test_api_key',
         breezeFormId: 'test_form_id',
-        emailTemplate: 'test_template',
+        smtpHost: 'smtp.ethereal.email',
+        smtpPort: 587,
+        smtpSecure: false,
+        smtpUsername: 'test_username',
+        smtpPassword: 'test_password',
+        subjectTemplate: 'Test Email',
+        textTemplate: 'Test Email',
+        htmlTemplate: 'Test Email',
         emailFrom: 'test@example.com',
+        emailBcc: 'test@example.com',
+
         formFieldMappings: {
           firstName: 'first_name',
           lastName: 'last_name',

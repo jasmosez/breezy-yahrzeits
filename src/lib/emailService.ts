@@ -2,10 +2,23 @@ import nodemailer from 'nodemailer';
 import { YahrzeitForm } from '@/services/yahrzeitService';
 import { getCurrentOrganization } from '@/lib/auth';
 
+interface EmailDetails {
+  email: string;
+  first_name: string;
+  relationship: string;
+  english_name_deceased: string;
+  next_yahrzeit_observed: string;
+  greg_date_of_passing: string;
+  sunset_preposition: string;
+  hebrew_date_of_passing: string;
+  calendar: string;
+  next_yahrzeit_gregorian: string;
+}
+
 // Default email templates (fallback if database templates are not available)
 const defaultTemplates = {
-  subject: (details: any) => `Yahrzeit Reminder: ${details.english_name_deceased}`,
-  text: (details: any) => `
+  subject: (details: EmailDetails) => `Yahrzeit Reminder: ${details.english_name_deceased}`,
+  text: (details: EmailDetails) => `
 Dear ${details.first_name},
 
 This is a reminder that the yahrzeit for ${details.english_name_deceased} (${details.relationship}) will be observed on ${details.next_yahrzeit_observed}.
@@ -17,7 +30,7 @@ Please let us know if you have any questions.
 Best regards,
 Your Synagogue
   `,
-  html: (details: any) => `
+  html: (details: EmailDetails) => `
 <!DOCTYPE html>
 <html>
 <head>
@@ -123,13 +136,13 @@ export class EmailService {
 
       // Use organization templates or fall back to defaults
       return {
-        subject: (details: any) => organization.subjectTemplate ? 
+        subject: (details: EmailDetails) => organization.subjectTemplate ? 
           this.replaceTemplateVariables(organization.subjectTemplate, details) : 
           defaultTemplates.subject(details),
-        text: (details: any) => organization.textTemplate ? 
+        text: (details: EmailDetails) => organization.textTemplate ? 
           this.replaceTemplateVariables(organization.textTemplate, details) : 
           defaultTemplates.text(details),
-        html: (details: any) => organization.htmlTemplate ? 
+        html: (details: EmailDetails) => organization.htmlTemplate ? 
           this.replaceTemplateVariables(organization.htmlTemplate, details) : 
           defaultTemplates.html(details)
       };
@@ -140,7 +153,7 @@ export class EmailService {
   }
 
   // Replace template variables with actual values
-  private replaceTemplateVariables(template: string, details: any): string {
+  private replaceTemplateVariables(template: string, details: EmailDetails): string {
     let result = template;
     for (const [key, value] of Object.entries(details)) {
       const regex = new RegExp(`{{${key}}}`, 'g');
@@ -210,7 +223,7 @@ export class EmailService {
   // Send a single email
   private async sendEmail(form: YahrzeitForm) {
 
-    const details = {
+    const details:EmailDetails = {
       email: form.profile_email?.trim() || '',
       first_name: form.profile_first_name?.trim() || '',
       relationship: form.relationship?.trim() || 'beloved deceased',
