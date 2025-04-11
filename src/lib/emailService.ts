@@ -126,8 +126,8 @@ export class EmailService {
 
       // Check if organization has templates
       if (!organization.subjectTemplate && !organization.textTemplate && !organization.htmlTemplate) {
-        if (this.isDevelopmentMode) {
-          console.warn('No email templates found in organization. Development mode: Using default templates');
+        if (this.isTestMode) {
+          console.warn('No email templates found in organization. Test mode: Using default templates');
           return defaultTemplates;
         } else {
           throw new Error('No email templates found in organization');
