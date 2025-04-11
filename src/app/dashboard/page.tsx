@@ -7,7 +7,7 @@ import { generateMonthOptions, parseMonthValue, MonthOption, PLACEHOLDER_OPTION 
 import { YahrzeitForm, YahrzeitProcessingError, MEMBER_STATUS } from '@/services/yahrzeitService';
 import { generateCsvFromForms, generateTextFromForms } from '@/lib/exportUtils';
 import { SmtpStatus } from '@/lib/emailServiceRegistry';
-
+import { FailedEmail } from '@/app/api/email/route';
 export default function DashboardPage() {
   const [monthOptions, setMonthOptions] = useState<MonthOption[]>([]);
   const [selectedMonth, setSelectedMonth] = useState<string>(PLACEHOLDER_OPTION.value);
@@ -117,7 +117,7 @@ export default function DashboardPage() {
       // Process in batches of 4
       const BATCH_SIZE = 4;
       let successCount = 0;
-      let failedEmails: any[] = [];
+      let failedEmails: FailedEmail[] = [];
       
       // Show progress dialog
       alert(`Starting to send emails in batches of ${BATCH_SIZE}. Please wait for completion...`);

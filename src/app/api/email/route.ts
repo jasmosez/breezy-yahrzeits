@@ -3,6 +3,13 @@ import { YahrzeitForm } from '@/services/yahrzeitService';
 import { emailServiceRegistry } from '@/lib/emailServiceRegistry';
 import { getCurrentOrganization } from '@/lib/auth';
 
+export interface FailedEmail {
+  name: string | undefined;
+  email: string | undefined;
+  deceasedName: string | undefined;
+  error: string | undefined;
+}
+
 export async function POST(request: NextRequest) {
   try {
     const organization = await getCurrentOrganization();
@@ -55,7 +62,7 @@ export async function POST(request: NextRequest) {
       previewUrl: r.previewUrl
     }));
     
-    const failedEmails = failed.map(r => ({
+    const failedEmails: FailedEmail[] = failed.map(r => ({
       name: r.name,
       email: r.email,
       deceasedName: r.deceasedName,
