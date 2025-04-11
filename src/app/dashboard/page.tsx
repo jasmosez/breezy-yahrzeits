@@ -14,6 +14,7 @@ export default function DashboardPage() {
   const [forms, setForms] = useState<YahrzeitForm[]>([]);
   const [count, setCount] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false);
+  const [sendingEmails, setSendingEmails] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
   const [processingErrors, setProcessingErrors] = useState<YahrzeitProcessingError[]>([]);
   const [smtpStatus, setSmtpStatus] = useState<SmtpStatus | null>(null);
@@ -96,7 +97,7 @@ export default function DashboardPage() {
 
   const handleSendEmails = async () => {
     try {
-      
+
       if (members.length === 0) {
         alert('No eligible members found for email notifications.');
         return;
@@ -110,33 +111,67 @@ export default function DashboardPage() {
       if (!confirmed) {
         return;
       }
+
+      setSendingEmails(true);
+
+      // Process in batches of 4
+      const BATCH_SIZE = 4;
+      let successCount = 0;
+      let failedEmails: any[] = [];
       
-      // Call the email API endpoint
-      const response = await fetch('/api/email', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ forms: members }),
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to send emails');
+      // Show progress dialog
+      alert(`Starting to send emails in batches of ${BATCH_SIZE}. Please wait for completion...`);
+
+      for (let i = 0; i < members.length; i += BATCH_SIZE) {
+        const batch = members.slice(i, i + BATCH_SIZE);
+        const batchNumber = Math.floor(i / BATCH_SIZE) + 1;
+        const totalBatches = Math.ceil(members.length / BATCH_SIZE);
+        
+        console.log(`Processing batch ${batchNumber} of ${totalBatches}`);
+        
+        try {
+          const response = await fetch('/api/email', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ forms: batch }),
+          });
+          
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Failed to send emails');
+          }
+          
+          const result = await response.json();
+          successCount += result.successfulEmails.length;
+          failedEmails = [...failedEmails, ...result.failedEmails];
+          
+          // Show progress after each batch
+          console.log(`Batch ${batchNumber}/${totalBatches} complete. Success: ${result.successfulEmails.length}, Failed: ${result.failedEmails.length}`);
+        } catch (error) {
+          console.error(`Error processing batch ${batchNumber}:`, error);
+          failedEmails = [...failedEmails, ...batch.map(form => ({
+            name: form.profile_first_name,
+            email: form.profile_email,
+            deceasedName: form.english_name_deceased,
+            error: error instanceof Error ? error.message : 'Unknown error'
+          }))];
+        }
       }
       
-      const result = await response.json();
-      
-      // Show success message
-      alert(`Successfully sent ${result.successfulEmails.length} emails. ${result.failedEmails.length} failed.`);
+      // Show final results
+      alert(`Completed sending emails:\n${successCount} successful\n${failedEmails.length} failed`);
       
       // Log any failures for debugging
-      if (result.failedEmails.length > 0) {
-        console.error('Failed to send emails to:', result.failedEmails);
+      if (failedEmails.length > 0) {
+        console.error('Failed to send emails to:', failedEmails);
       }
     } catch (error) {
       console.error('Error sending emails:', error);
       alert('An error occurred while sending emails. Please try again later.');
+    } finally {
+      setSendingEmails(false);
     }
   };
 
@@ -150,12 +185,12 @@ export default function DashboardPage() {
   }, {} as Record<string, YahrzeitProcessingError[]>);
 
   return (
-    <Layout>
-      <div className="card">
-        <h1 style={{ marginBottom: '1rem' }}>
-          Yahrzeit Dashboard
-        </h1>
-        
+      <Layout>
+        <div className="card">
+          <h1 style={{ marginBottom: '1rem' }}>
+            Yahrzeit Dashboard
+          </h1>
+
         <div className="form-group" style={{ marginBottom: '2rem' }}>
           <label htmlFor="month-select" className="form-label">
             Select Month
@@ -165,7 +200,7 @@ export default function DashboardPage() {
             className="form-input"
             value={selectedMonth}
             onChange={handleMonthChange}
-            disabled={loading}
+            disabled={loading || sendingEmails}
           >
             {monthOptions.map(option => (
               <option 
@@ -223,26 +258,26 @@ export default function DashboardPage() {
                   <button 
                     className="button" 
                     onClick={handleExportCsv}
-                    disabled={loading}
+                    disabled={loading || sendingEmails}
                   >
                     Download CSV ({count})
                   </button>
                   <button 
                     className="button" 
                     onClick={handleExportText}
-                    disabled={loading || selectedMonth === 'all'}
+                    disabled={loading || sendingEmails || selectedMonth === 'all'}
                   >
                     Download Shabbat Text ({membersAndDeceased.length})
                   </button>
                   <button 
                     className="button" 
                     onClick={handleSendEmails}
-                    disabled={loading || selectedMonth === 'all'}
+                    disabled={loading || sendingEmails || selectedMonth === 'all'}
                   >
-                    {smtpStatus?.isTestMode ? 'Send Test Emails' : 'Send Emails'} ({members.length})
+                    {sendingEmails ? 'Sending emails...' : (smtpStatus?.isTestMode ? 'Send Test Emails' : 'Send Emails')} ({members.length})
                   </button>
                 </div>
-                
+
                 <YahrzeitTable forms={forms} />
               </div>
             )}
