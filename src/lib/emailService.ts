@@ -200,7 +200,10 @@ export class EmailService {
 
       // Check if organization has SMTP settings
       if (!organization.smtpHost || !organization.smtpPort || !organization.smtpUsername || !organization.smtpPassword) {
-        throw new Error('Incomplete SMTP settings for organization');
+        // TODO: Decide whether we want to throw an error here or just log a warning
+        // throw new Error('Incomplete SMTP settings for organization');
+        console.warn('Incomplete SMTP settings for organization: using Ethereal Mail for testing');
+        return await this.useTestSmtp();
       }
 
       this.smtpHost = organization.smtpHost;
