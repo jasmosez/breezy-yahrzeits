@@ -1,4 +1,5 @@
 import nodemailer from 'nodemailer';
+import path from 'path';
 import { YahrzeitForm } from '@/services/yahrzeitService';
 import { getCurrentOrganization } from '@/lib/auth';
 
@@ -252,6 +253,8 @@ export class EmailService {
       throw new Error('Authentication error: No organization found');
     }
 
+    const attachmentPath = path.join(process.cwd(), 'public', 'assets', 'yahrzeit_banner.jpeg');
+
     try {
       const info = await this.transporter!.sendMail({
         from: organization.emailFrom || 'noreply@example.com',
@@ -263,7 +266,7 @@ export class EmailService {
         // TODO: genericize attachments
         attachments: [{
           filename: 'yahrzeit_banner.jpeg',
-          path: './public/assets/yahrzeit_banner.jpeg',
+          path: attachmentPath,
           cid: 'thisistheyahrzeitbanner'
         }]
       });
